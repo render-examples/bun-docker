@@ -6,6 +6,6 @@
     "dev": "bun --hot app.ts"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "@types/bun": "latest"
   }
 }

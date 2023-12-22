@@ -8,4 +8,4 @@ const server = Bun.serve({
   },
 });
 
-console.log(`[${NODE_ENV}] Listening on port ${server.port}`);
+console.log(`[${NODE_ENV}] Serving http://localhost:${server.port}`);
