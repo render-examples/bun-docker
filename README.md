@@ -1,8 +1,12 @@
 # bun-docker
 
-> Deploy a simple Bun [HTTP server](https://bun.sh/docs/api/http) on Render
+> [!IMPORTANT]
+> Render now supports Bun natively, so you can use Bun without Docker.
+> Learn more in our [language support docs](https://docs.render.com/language-support).
 
-[Bun](https://bun.sh/) is a JavaScript runtime that serves as a bundler, test runner, and package manager.
+## About
+
+Deploy a simple Bun [HTTP server](https://bun.sh/docs/api/http) on Render. [Bun](https://bun.sh/) is a JavaScript runtime that serves as a bundler, test runner, and package manager.
 
 ## Prerequisites
 
