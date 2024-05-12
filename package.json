@@ -1,9 +1,9 @@
 {
-  "license": "MIT",
-  "private": true,
   "scripts": {
-    "start": "bun app.ts",
-    "dev": "bun --hot app.ts"
+    "dev": "bun run --hot src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.3.4"
   },
   "devDependencies": {
     "@types/bun": "latest"
