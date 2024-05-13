@@ -1,12 +1,18 @@
 {
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts"
+    "dev": "bun run --hot src/index.js",
+    "start": "bun run src/index.js",
+    "generate": "drizzle-kit generate",
+    "migrate": "bun run src/config/migrations.js"
   },
   "dependencies": {
-    "hono": "^4.3.4"
+    "drizzle-orm": "^0.30.10",
+    "hono": "^4.3.4",
+    "pg": "^8.11.5"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/pg": "^8.11.6",
+    "drizzle-kit": "^0.21.1"
   }
 }
