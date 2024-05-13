@@ -8,6 +8,4 @@ COPY . .
 
 ENV NODE_ENV production
 
-CMD [ "bun", "start"]
-
-RUN bun migrate
+CMD [ "bun", "start", "&&", "bun", "migrate"]
