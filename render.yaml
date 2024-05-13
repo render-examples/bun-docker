@@ -5,5 +5,8 @@ services:
     repo: https://github.com/render-examples/bun-docker
     plan: starter
     autoDeploy: false
-    buildCommand: bun run src/config/migrations.js    
+    #buildCommand: bun run src/config/migrations.js    
+    postBuild:
+      - bun run src/config/migrations.js
+      - echo "Migration done"
     
