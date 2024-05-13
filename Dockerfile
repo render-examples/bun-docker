@@ -9,5 +9,3 @@ COPY . .
 ENV NODE_ENV production
 
 CMD [ "bun", "start"]
-
-ENTRYPOINT [ "bun", "migrate"]
