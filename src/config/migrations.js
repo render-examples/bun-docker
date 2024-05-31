@@ -12,5 +12,5 @@ await migrate(db, { migrationsFolder: './drizzle' }).catch((err) => {
     console.log("Migrations ran successfully");
     let user = await db.select().from(users).where(eq(users.name,'Ruben Navarro'))
     if(!user) await db.insert(users).values({ name: 'Ruben Navarro', email: 'ruben@xar.cl', password: 'xar2024'});
-    await client.end();
   });
+  await client.end();
