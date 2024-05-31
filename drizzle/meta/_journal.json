@@ -15,6 +15,13 @@
       "when": 1715569594295,
       "tag": "0001_rapid_celestials",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1716608909074,
+      "tag": "0002_productive_jazinda",
+      "breakpoints": true
     }
   ]
 }

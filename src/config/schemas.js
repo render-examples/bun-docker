@@ -32,4 +32,25 @@ export const kids_plans = pgTable("kids_plans",{
         date: timestamp("date").notNull().$default("now()")
 });
 
+export const agenda = pgTable("agenda",{
+
+    id: serial("id").primaryKey().notNull(),
+    evento: text("evento"),
+    descripcion: text("descripcion"),
+    fecha: timestamp("fecha").notNull(),
+    start: timestamp("hora_comienzo").notNull(),
+    end: timestamp("end").notNull(),
+    numero_contacto: text("numero_contacto"),
+    planId: integer("planId").notNull().references(()=>plans.id)
+});
+
+export const pagos = pgTable("pagos",{
+
+    id: serial("id").primaryKey().notNull(),
+    kidId: integer("kidId").references(()=>kids.id),
+    planId: integer("planId").notNull().references(()=>plans.id),
+    date: timestamp("date").notNull().$default("now()"),
+    amount: integer("amount").notNull()
+});
+
 
