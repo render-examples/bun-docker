@@ -11,53 +11,106 @@ export default function Scheduler() {
         `
         <div id="event-modal" class="modal">
                 <div class="modal-background"></div>
-                <div class="modal-content">
-                    <div class="box">
-                        <form id="create-event-form" hx-post="/api/v1/agenda" hx-ext="json-enc">
-                            <div class="field">
-                                <label class="label">Evento</label>
+                <div class="modal-content" style="width: 80%; height:80%;overflow:hidden;">
+                <form id="create-event-form" hx-post="/api/v1/agenda" hx-ext="json-enc">
+                    <div class="columns">
+                        <div class="column is-3">
+                            <div class="box">
+                                <h3 class="title">Crear Evento</h3>
+                                <div class="field">
+                                        <label class="label">Evento</label>
+                                        <div class="control">
+                                            <input class="input" type="text" name="evento" id="event-title" required>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label">Descripcion</label>
+                                        <div class="control">
+                                            <textarea class="textarea" rows="5" name="descripcion"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label">Numero contacto</label>
+                                        <div class="control">
+                                            <input class="input" type="text" name="numero_contacto" id="event-title" required>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="column is-3">
+                            <div class="box">
+                                <h3 class="title">Detalles</h3>                                    
+                                    
+                                <div class="field">
+                                    <label class="label">Fecha</label>
+                                    <div class="control">
+                                        <input class="input" type="date" name="fecha" id="event-start">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Hora Comienzo</label>
+                                    <div class="control">
+                                        <input class="input" type="time" name="start" id="event-end">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Hora Termino</label>
+                                    <div class="control">
+                                        <input class="input" type="time" name="end" id="event-end">
+                                    </div>
+                                </div>
+                                
                                 <div class="control">
-                                    <input class="input" type="text" name="evento" id="event-title" required>
+                                    <button type="submit" class="button is-primary">Create Event</button>
                                 </div>
                             </div>
-                            <div class="field">
-                                <label class="label">Descripcion</label>
-                                <div class="control">
-                                    <input class="input" type="text" name="descripcion" id="event-title" required>
+                        </div>
+                        <div class="column is-6">
+                            <div class="box">
+                                <h3 class="title">Pagos</h3>
+                                <div class="columns">
+                                    <div class="column is-6">
+                                        <div class="field">
+                                            ${<SelectPlans />}
+                                        </div>
+                                    </div>
+                                    <div class="column is-6">
+                                        <div class="field">
+                                            <label class="label">Monto a Pagar</label>
+                                            <div class="control">
+                                                <input class="input" type="number" name="amount" id="event-title" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Documento</label>
+                                    <div class="control">
+                                        <div class="file has-name">
+                                            <label class="file-label">
+                                                <input class="file-input" type="file" name="resume" />
+                                                <span class="file-cta">
+                                                    <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                    </span>
+                                                    <span class="file-label"> Elija un archivo</span>
+                                                </span>
+                                                <span class="file-name"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="field">
-                                <label class="label">Numero contacto</label>
-                                <div class="control">
-                                    <input class="input" type="text" name="numero_contacto" id="event-title" required>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="label">Fecha</label>
-                                <div class="control">
-                                    <input class="input" type="date" name="fecha" id="event-start">
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="label">Hora Comienzo</label>
-                                <div class="control">
-                                    <input class="input" type="time" name="start" id="event-end">
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="label">Hora Termino</label>
-                                <div class="control">
-                                    <input class="input" type="time" name="end" id="event-end">
-                                </div>
-                            </div>
-                            <div class="field">
-                                ${<SelectPlans />}
-                            </div>
-                            <div class="control">
-                                <button type="submit" class="button is-primary">Create Event</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
+                    <div class="columns">
+                        <div class="column is-12">
+                            <div class="box">
+                                <h3 class="title">Resumen</h3>
+                            </div>
+                        </div>
+                    </div>                
+                    </form>
                 </div>
                 <button class="modal-close is-large" aria-label="close" hx-on:click="htmx.find('#event-modal').classList.remove('is-active')"></button>
         </div>
@@ -69,7 +122,6 @@ export default function Scheduler() {
             document.addEventListener('DOMContentLoaded', function() {
                 
                 document.getElementById('create-event-form').addEventListener('htmx:afterRequest', evt => {
-                    console.log(evt.detail)
                     if (event.detail.xhr.responseURL.includes('/api/v1/agenda') && event.detail.requestConfig.verb === 'post' && event.detail.xhr.status === 201) {
                         htmx.find('#event-modal').classList.remove('is-active')
                         bulmaToast.toast({
@@ -88,6 +140,7 @@ export default function Scheduler() {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'timeGridWeek',
                     locale: 'es',
+                    timeZone: 'local',
                     customButtons: {
                         createEventButton: {
                             text: 'Crear Evento',

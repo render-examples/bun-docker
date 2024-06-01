@@ -50,7 +50,8 @@ export const pagos = pgTable("pagos",{
     kidId: integer("kidId").references(()=>kids.id),
     planId: integer("planId").notNull().references(()=>plans.id),
     date: timestamp("date").notNull().$default("now()"),
-    amount: integer("amount").notNull()
+    amount: integer("amount").notNull(),
+    eventoId: integer("eventoId").references(()=>agenda.id)
 });
 
 
