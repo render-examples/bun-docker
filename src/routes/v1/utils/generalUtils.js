@@ -1,5 +1,5 @@
 
-const moment = require('moment');
+const moment = require('moment-timezone')
 
 
 
@@ -17,4 +17,8 @@ export const timeStringToTimestamp = (timeString) => {
     let moment_date =  moment(datetimeString).toDate()
     return moment(moment_date).utc()
     
+}
+
+export const setMomentTimezone = (date) => {
+    return moment(date).tz('America/Santiago')
 }
