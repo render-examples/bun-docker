@@ -18,7 +18,7 @@ agenda_router.post('/', zValidator('json',agendaValidator),async (c) => {
 
     let result = await c.db.insert(agenda).values(data).returning()
     if(!result) return c.text('Error al insertar la agenda', 400)
-        
+
     c.header('HX-Trigger', 'refreshCalendar')
     c.status(201)
     return c.text('Evento creado!')
@@ -30,9 +30,9 @@ agenda_router.get('/', async (c) => {
     c.status(200)
     let data = await c.db.select().from(agenda)
     data.forEach(event => {
-        event.fecha = setMomentTimezone(event.fecha).toDate()
-        event.start = setMomentTimezone(event.start).toDate()
-        event.end = setMomentTimezone(event.end).toDate()
+        event.fecha = setMomentTimezone(event.fecha)
+        event.start = setMomentTimezone(event.start)
+        event.end = setMomentTimezone(event.end)
     });
     return c.json(data? data : [])
 })
