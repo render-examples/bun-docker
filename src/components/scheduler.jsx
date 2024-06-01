@@ -140,7 +140,7 @@ export default function Scheduler() {
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'timeGridWeek',
                     locale: 'es',
-                    timeZone: 'local',
+                    timeZone: 'America/Santiago',
                     customButtons: {
                         createEventButton: {
                             text: 'Crear Evento',
