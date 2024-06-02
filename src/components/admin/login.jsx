@@ -36,7 +36,7 @@ export default function Login() {
                 document.getElementById('login-form').addEventListener('htmx:afterRequest', evt => {
                     if(evt.detail.xhr.status === 200){
                         bulmaToast.toast({
-                            message: 'Bienvenido...redireccionando.',
+                            message: 'La magia esta por comenzar...',
                             type: 'is-success',
                             duration: 3000,
                             dismissible: true,

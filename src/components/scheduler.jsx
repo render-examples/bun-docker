@@ -12,7 +12,7 @@ export default function Scheduler() {
         <div id="event-modal" class="modal">
                 <div class="modal-background"></div>
                 <div class="modal-content" style="width: 80%; height:80%;overflow:hidden;">
-                <form id="create-event-form" hx-post="/api/v1/agenda" hx-ext="json-enc">
+                <form id="create-event-form" hx-post="/api/v1/agenda" hx-ext="json-enc" hx-swap="none">
                     <div class="columns">
                         <div class="column is-3">
                             <div class="box">
@@ -61,7 +61,7 @@ export default function Scheduler() {
                                 </div>
                                 
                                 <div class="control">
-                                    <button type="submit" class="button is-primary">Create Event</button>
+                                    <button type="submit" class="button is-primary">Crear Evento</button>
                                 </div>
                             </div>
                         </div>
@@ -124,6 +124,7 @@ export default function Scheduler() {
                 document.getElementById('create-event-form').addEventListener('htmx:afterRequest', evt => {
                     if (event.detail.xhr.responseURL.includes('/api/v1/agenda') && event.detail.requestConfig.verb === 'post' && event.detail.xhr.status === 201) {
                         htmx.find('#event-modal').classList.remove('is-active')
+                        htmx.find('#create-event-form').reset()
                         bulmaToast.toast({
                             message: 'Evento creado correctamente',
                             type: 'is-success',
