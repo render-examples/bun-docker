@@ -1,7 +1,6 @@
 import { html} from 'hono/html'
 
-const SelectPlans = () => {
-
+const SelectPlans = (data) => {
     return(html
         `
         <label class="label">Plan</label>
@@ -17,7 +16,7 @@ const SelectPlans = () => {
                 let plans = evt.detail.xhr.response
                 plans = JSON.parse(plans)
                 select.innerHTML = plans.map(plan => {
-                    return \`<option value="\${plan.id}">\${plan.name}</option>\`
+                    return \`<option value="\${plan.id}" \${plan.id === ${data.data} ? 'selected' : ''}>\${plan.name}</option>\`
                 }).join('')
             })
         </script>

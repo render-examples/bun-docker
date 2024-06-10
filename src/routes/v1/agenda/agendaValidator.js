@@ -13,4 +13,14 @@ const agendaValidator = z.object({
     planId: z.string().min(1).max(255)
 });
 
-export { agendaValidator }
+const agendaPutValidator = z.object({
+    evento: z.string().min(1).max(255).optional(),
+    descripcion: z.string().min(1).max(255).optional(),
+    fecha: z.string().min(1).max(255).optional(),
+    start: z.string().min(1).max(255).optional(),
+    end: z.string().min(1).max(255).optional(),
+    numero_contacto: z.string().min(1).max(255).optional(),
+    planId: z.string().min(1).max(255).optional()
+});
+
+export { agendaValidator, agendaPutValidator }
