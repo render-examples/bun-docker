@@ -27,7 +27,9 @@ export default function Nav() {
                     <a class="navbar-item" href="/admin/home">
                         Inicio
                     </a>
-
+                    <a class="navbar-item" href="/admin/kids">
+                        Ingreso Niños
+                    </a>
                     <a class="navbar-item" href="/admin/agenda">
                         Agenda
                     </a>

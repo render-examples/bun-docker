@@ -32,7 +32,7 @@ export default function Scheduler() {
                         eventClick: function(info) {
                             let elem = htmx.find('#test')
                             elem.setAttribute('hx-ext','json-enc')
-                            htmx.ajax('get', '/api/v1/agenda/form/' + info.event.extendedProps.id, {target: elem})
+                            htmx.ajax('get', '/api/v1/agenda/form/' + info.event.extendedProps.agenda.id, {target: elem})
                         },
                         headerToolbar: {
                             left: 'prev,next today',
@@ -56,12 +56,12 @@ export default function Scheduler() {
                             const events = JSON.parse(event.detail.xhr.responseText)
                             let events_formatted = events.map(event => {
 
-                                let fecha = event.fecha.split('T')[0]
-                                let start = event.start.split('T')[1]
-                                let end = event.end.split('T')[1]
+                                let fecha = event.agenda.fecha.split('T')[0]
+                                let start = event.agenda.start.split('T')[1]
+                                let end = event.agenda.end.split('T')[1]
 
                                 return {
-                                    title: event.evento,
+                                    title: event.agenda.evento,
                                     start: fecha + 'T' + start,
                                     end: fecha + 'T' + end,
                                     extendedProps: event

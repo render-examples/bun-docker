@@ -29,6 +29,34 @@
       "when": 1717194784556,
       "tag": "0003_silky_iron_fist",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1718146963886,
+      "tag": "0004_sudden_ken_ellis",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1718252419154,
+      "tag": "0005_tough_colossus",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1718257137774,
+      "tag": "0006_messy_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1718307906790,
+      "tag": "0007_smooth_sunspot",
+      "breakpoints": true
     }
   ]
 }

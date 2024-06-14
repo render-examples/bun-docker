@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { serveStatic } from 'hono/bun'
-import { eq} from 'drizzle-orm';
+import { eq,and} from 'drizzle-orm';
 
 
 import { agendaValidator,agendaPutValidator } from './agendaValidator'
-import { agenda } from '../../../config/schemas'
+import { agenda, pagos, plans } from '../../../config/schemas'
 import { dateStringToTimestamp, timeStringToTimestamp, setMomentTimezone} from '../utils/generalUtils'
 import { FormGestion } from '../../../components/admin/agenda/formGestion'
 
@@ -35,11 +35,11 @@ agenda_router.post('/', zValidator('json',agendaValidator),async (c) => {
 agenda_router.get('/', async (c) => {
     c.header('Content-Type','application/json')
     c.status(200)
-    let data = await c.db.select().from(agenda)
+    let data = await c.db.select().from(agenda).where(eq(plans.type,'evento')).innerJoin(plans, eq(agenda.planId, plans.id))
     data.forEach(event => {
-        event.fecha = setMomentTimezone(event.fecha)
-        event.start = setMomentTimezone(event.start)
-        event.end = setMomentTimezone(event.end)
+        event.agenda.fecha = setMomentTimezone(event.agenda.fecha)
+        event.agenda.start = setMomentTimezone(event.agenda.start)
+        event.agenda.end = setMomentTimezone(event.agenda.end)
     });
     return c.json(data? data : [])
 })
@@ -48,11 +48,13 @@ agenda_router.get('/form/:id?', async (c) => {
 
     let id = await c.req.param('id')
     let data = await c.db.select().from(agenda).where(eq(agenda.id, id))
+                .innerJoin(plans, eq(agenda.planId, plans.id))
+                .leftJoin(pagos, eq(plans.id, pagos.planId))
     
     if(data.length > 0){
-        data[0].fecha = moment(data[0].fecha).format('YYYY-MM-DD')
-        data[0].start = moment(data[0].start).format('HH:mm')
-        data[0].end = moment(data[0].end).format('HH:mm')
+        data[0].agenda.fecha = moment(data[0].agenda.fecha).format('YYYY-MM-DD')
+        data[0].agenda.start = moment(data[0].agenda.start).format('HH:mm')
+        data[0].agenda.end = moment(data[0].agenda.end).format('HH:mm')
 
     }
     

@@ -1,7 +1,6 @@
 import { html } from 'hono/html'
 
 const TablePlans = ({plans}) => {
-    console.log(plans)
     let table_rows = '<tr><td>nada</td></tr>'
 
     if(plans){

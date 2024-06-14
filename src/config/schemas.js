@@ -14,6 +14,7 @@ export const kids = pgTable("kids",{
     name: text("name"),
     rut: text("rut"),
     responsable: text("responsable"),
+    status: text("status"),
     phone: text("phone"),
 });
 
@@ -23,13 +24,14 @@ export const plans = pgTable("plans",{
     name: text("name"),
     price: integer("price"),
     duration: integer("duration"),
+    type: text("type")
 });
 
 export const kids_plans = pgTable("kids_plans",{
         id: serial("id").notNull().primaryKey(),
         kidId: integer("kidId").notNull().references(() => kids.id),
         planId: integer("planId").notNull().references(()=>plans.id),
-        date: timestamp("date").notNull().$default("now()")
+        date: timestamp("date").notNull().defaultNow()
 });
 
 export const agenda = pgTable("agenda",{
@@ -49,9 +51,14 @@ export const pagos = pgTable("pagos",{
     id: serial("id").primaryKey().notNull(),
     kidId: integer("kidId").references(()=>kids.id),
     planId: integer("planId").notNull().references(()=>plans.id),
-    date: timestamp("date").notNull().$default("now()"),
+    date: timestamp("date").notNull().defaultNow(),
     amount: integer("amount").notNull(),
     eventoId: integer("eventoId").references(()=>agenda.id)
 });
 
+export const documento = pgTable("documento",{
+    id: serial("id").primaryKey().notNull(),
+    url: text("url"),
+    pagosId: integer("pagosId").notNull().references(()=>pagos.id)
+});
 

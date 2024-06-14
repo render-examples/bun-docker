@@ -25,6 +25,15 @@ export default function Planes() {
                                 </div>
                             </div>
                             <div class="field">
+                                <label class="label">Tipo</label>
+                                <div class="control">
+                                    <select class="input" name="type" required>
+                                        <option value="pase">Pase/Entrada</option>
+                                        <option value="evento">Evento</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
                                 <label class="label">Duracion</label>
                                 <div class="control">
                                     <input class="input" type="number" name="duration" id="event-title" required>

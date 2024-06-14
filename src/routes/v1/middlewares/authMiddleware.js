@@ -37,7 +37,7 @@ export async function authMiddleware(c) {
         const decoded = await verify(token, Bun.env.secret)
         c.req.validated_user = decoded
     } catch (err) {
-        return c.json({ message: 'Invalid token' }, 401)
+        return c.redirect('/admin/login', 401)
     }
 
     return

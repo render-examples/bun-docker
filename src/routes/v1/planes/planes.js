@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-
+import { eq } from 'drizzle-orm'
 
 import { planValidator } from './validators/planValidator'
 import { plans } from '../../../config/schemas'
@@ -20,6 +20,13 @@ planes_router.post('/', zValidator('json', planValidator) , async c => {
 })
 
 planes_router.get('/', async c => {    
+
+    
+    if(c.req.query('type')){
+        let data = await c.db.select().from(plans).where(eq(plans.type, c.req.query('type')))
+        return c.json(data)
+    }
+
     c.header('Content-Type','application/json')
     return c.json(await c.db.select().from(plans))
 })

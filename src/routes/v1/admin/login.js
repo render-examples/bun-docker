@@ -7,6 +7,7 @@ import Home from '../../../components/admin/home'
 import Nav  from '../../../components/admin/nav'
 import Agenda from '../../../components/admin/agenda'
 import Planes from '../../../components/admin/planes'
+import Kids from '../../../components/admin/niños/kids'
 import { authMiddleware } from '../middlewares/authMiddleware';
 
 
@@ -36,6 +37,11 @@ admin_routes.get('/home', async(c) => {
 admin_routes.get('/agenda', async(c) => {
     
     return c.html(<AdminLayout nav={<Nav/>} main={<Agenda/>} />)
+})
+
+admin_routes.get('/kids', async(c) => {
+    
+    return c.html(<AdminLayout nav={<Nav/>} main={<Kids/>} />)
 })
 
 admin_routes.get('/planes', async(c) => {
