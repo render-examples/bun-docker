@@ -14,6 +14,7 @@ export default function AdminLayout({nav,main}) {
                     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
                     <script src="https://cdn.jsdelivr.net/npm/bulma-toast@2.4.4/dist/bulma-toast.min.js"></script>
                     <script src="https://unpkg.com/lucide@latest"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/zod@3.23.8/lib/index.umd.min.js"></script>
                     {/*
                     <style type="text/css">
                     

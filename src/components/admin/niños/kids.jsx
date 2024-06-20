@@ -3,6 +3,7 @@
 import { html } from 'hono/html'
 import { SelectPlans } from '../agenda/plans'
 
+
 export default function Kids() {
 
     return(
@@ -20,11 +21,12 @@ export default function Kids() {
                     <div class="modal-background"></div>
                     <div class="modal-content">
                         <div class="box">
-                            <form id="create-kid" hx-post="/api/v1/kids" hx-ext="json-enc" hx-swap="none">
+                            <form id="create-kid" hx-ext="json-enc" hx-post="/api/v1/kids" hx-trigger="create_kid" hx-swap="none">
                                 <div class="field">
-                                    <label class="label">Nombre Niño</label>
+                                    <label class="label">Nombre y Apellido Niño</label>
                                     <div class="control">
-                                        <input class="input" type="text" name="name" id="event-title" required/>
+                                        <input class="input" type="text" name="name" id="form_name" />
+                                        <span id="nameError" class="error"></span>
                                     </div>
                                 </div>
                                 <div class="field">
@@ -33,19 +35,22 @@ export default function Kids() {
                                 <div class="field">
                                     <label class="label">Rut Responsable</label>
                                     <div class="control">
-                                        <input class="input" type="text" name="rut" id="event-title" required/>
+                                        <input class="input" type="text" name="rut" id="form_rut" />
+                                        <span id="rutError" class="error"></span>
                                     </div>
                                 </div>
                                 <div class="field">
                                     <label class="label">Nombre Responsable</label>
                                     <div class="control">
-                                        <input class="input" type="text" name="responsable" id="event-title" required/>
+                                        <input class="input" type="text" name="responsable" id="form_responsable" />
+                                        <span id="responsableError" class="error"></span>
                                     </div>
                                 </div>
                                 <div class="field">
                                     <label class="label">Telefono</label>
                                     <div class="control">
-                                        <input class="input" type="number" name="phone" id="event-title" required/>
+                                        <input class="input" type="number" name="phone" id="form_phone" />
+                                        <span id="phoneError" class="error"></span>
                                     </div>
                                 </div>
                                 <div class="control">
@@ -78,7 +83,55 @@ export default function Kids() {
                                     })   
                                 }
                             })
-                        </script>                            
+                        </script>
+                        <script type="module">
+
+                            const z = window.Zod
+                            let form = null
+
+                            const schema = z.object({
+                                name: z.string().min(5, "Campo debe tener minimo 5 caracteres").max(50, "Campo supera el maximo de 50 caracteres").nonempty("Nombre es requerido"),
+                                rut: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Rut es requerido"),
+                                responsable: z.string().min(1, "Campo debe tener minimo 1 caracter").max(30, "Campo supera el maximo de 30 caracteres").nonempty("Campo requerido"),
+                                phone: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Campo requerido"),
+                            });
+
+                            const errorMessages = {
+                                name: document.getElementById('nameError'),
+                                rut: document.getElementById('rutError'),
+                                responsable: document.getElementById('responsableError'),
+                                phone: document.getElementById('phoneError')
+                            };
+
+                            function clearErrors() {
+                                const errorElements = document.querySelectorAll('.error');
+                                errorElements.forEach(error =>{
+                                     error.textContent = ''
+                                     error.previousElementSibling.classList.remove('is-danger')
+
+                                });
+                            }
+
+                            document.getElementById('create-kid').addEventListener('submit', function(e){
+                                e.preventDefault()
+                                form = Object.fromEntries(new FormData(e.target))
+                                const result = schema.safeParse(form);
+                                if(!result.success){
+                                    clearErrors();
+                                    result.error.errors.forEach(error => {
+                                        if(error.path in errorMessages){
+                                            let input = htmx.find('#form_'+error.path)
+                                            input.classList.add('is-danger')
+                                            input.nextElementSibling.textContent = error.message
+                                            input.nextElementSibling.classList.add('has-text-danger')
+                                        }   
+                                    })
+                                }
+                                else{
+                                    htmx.trigger('#create-kid', 'create_kid')
+                                }
+                            })
+                        </script>
                     `
                 }
             </section>

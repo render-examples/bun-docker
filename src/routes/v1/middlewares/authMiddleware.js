@@ -29,7 +29,7 @@ export async function authMiddleware(c) {
 
     let token = await c.req.header('Cookie')
 
-    if (!token) return c.json({ message: 'Unauthorized' }, 401)
+    if (!token) return c.redirect('/admin/login', 401)
     
     token = token.split('=')[1]
 
@@ -37,7 +37,9 @@ export async function authMiddleware(c) {
         const decoded = await verify(token, Bun.env.secret)
         c.req.validated_user = decoded
     } catch (err) {
-        return c.redirect('/admin/login', 401)
+        console.log(err)
+        c.status(401)
+        return c.res.redirect('/admin/login')
     }
 
     return
