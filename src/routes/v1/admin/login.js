@@ -17,11 +17,14 @@ admin_routes.use('*', async(c,next) => {
 
     if(!c.req.url.includes('/login')){
         let result = await authMiddleware(c)
-        if(result) {
+        if(result.status === 401){
+            c.status(401)
+            c.header('Location','/admin/login')
             return c.redirect('/admin/login')
+            
         }
     }
-    await next()
+    return await next()
 })
 
 admin_routes.get('/login', (c) => {

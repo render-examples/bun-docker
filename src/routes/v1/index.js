@@ -13,13 +13,14 @@ const v1 = new Hono()
 
 v1.use('*', async(c, next) => {
     if(!await c.req.url.includes('auth')){
-        const result = await authMiddleware(c, next)
-        if(result){
-            return result
+        const result = await authMiddleware(c, next)        
+        if(result.status === 401){
+            c.header('HX-Redirect','/admin/login')
+            c.status(401)
         }
     }
     c.db = db
-    await next()
+    return await next()
 })
 v1.route('/kids', kids_router)
 v1.route('/planes', planes_router)

@@ -28,8 +28,9 @@ export async function userValidator(c,next) {
 export async function authMiddleware(c) {
 
     let token = await c.req.header('Cookie')
-
-    if (!token) return c.redirect('/admin/login', 401)
+    if (!token){
+        return {status: 401}
+    }
     
     token = token.split('=')[1]
 
@@ -38,9 +39,8 @@ export async function authMiddleware(c) {
         c.req.validated_user = decoded
     } catch (err) {
         console.log(err)
-        c.status(401)
-        return c.res.redirect('/admin/login')
+        return {redirect: '/admin/login', status: 401}
     }
 
-    return
+    return {status: 200}
 }

@@ -36,7 +36,7 @@ auth_routes.post('/login', validator('form', async(value,c)=>{
     }
 
     let token = await sign(payload, Bun.env.secret)
-    setCookie(c, 'auth_token', token, {httpOnly: true, maxAge: 3600, sameSite: 'strict'})
+    setCookie(c, 'auth_token', token, {httpOnly: true, maxAge: 60, sameSite: 'strict'})
     c.status(200)
     return c.text('Bienvenido!... Redirigiendo a la página de inicio.')
     
