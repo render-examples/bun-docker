@@ -32,11 +32,12 @@ auth_routes.post('/login', validator('form', async(value,c)=>{
     const payload = {
         email: await c.req.bodyCache.parsedBody.email,
         role: 'admin',
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // Token expires in 1 hour
+        //token expires in 5 hours
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 5
     }
 
     let token = await sign(payload, Bun.env.secret)
-    setCookie(c, 'auth_token', token, {httpOnly: true, maxAge: 3600, sameSite: 'strict'})
+    setCookie(c, 'auth_token', token, {httpOnly: true, maxAge: 3600, 18000: 'strict'})
     c.status(200)
     return c.text('Bienvenido!... Redirigiendo a la página de inicio.')
     
