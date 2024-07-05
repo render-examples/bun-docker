@@ -91,9 +91,9 @@ export default function Kids() {
 
                             const schema = z.object({
                                 name: z.string().min(5, "Campo debe tener minimo 5 caracteres").max(50, "Campo supera el maximo de 50 caracteres").nonempty("Nombre es requerido"),
-                                rut: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Rut es requerido"),
-                                responsable: z.string().min(1, "Campo debe tener minimo 1 caracter").max(30, "Campo supera el maximo de 30 caracteres").nonempty("Campo requerido"),
-                                phone: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Campo requerido"),
+                                //rut: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Rut es requerido"),
+                                //responsable: z.string().min(1, "Campo debe tener minimo 1 caracter").max(30, "Campo supera el maximo de 30 caracteres").nonempty("Campo requerido"),
+                                //phone: z.string().min(9, "Campo debe tener 9 caracteres").max(9, "Campo debe tener 9 caracteres").nonempty("Campo requerido"),
                             });
 
                             const errorMessages = {
