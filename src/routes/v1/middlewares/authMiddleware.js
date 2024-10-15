@@ -1,8 +1,8 @@
 
-import { db } from "../../../config/db"
-import { eq} from 'drizzle-orm';
+import { eq, name} from 'drizzle-orm';
 import { decode, sign, verify } from 'hono/jwt'
-import {getCookie,getSignedCookie} from 'hono/cookie'
+import { empresas, users } from '../../../config/schemas';
+import { db } from '../../../config/db';
 
 
 export async function userValidator(c,next) {
@@ -28,6 +28,7 @@ export async function userValidator(c,next) {
 export async function authMiddleware(c) {
 
     let token = await c.req.header('Cookie')
+    let decoded = null
     if (!token){
         return {status: 401}
     }
@@ -35,12 +36,20 @@ export async function authMiddleware(c) {
     token = token.split('=')[1]
 
     try{
-        const decoded = await verify(token, Bun.env.secret)
-        c.req.validated_user = decoded
+        decoded = await verify(token, Bun.env.secret)
     } catch (err) {
-        console.log(err)
         return {redirect: '/admin/login', status: 401}
     }
 
+    const data_usuario = await (await db.select().from(users).innerJoin(empresas, eq(users.empresaId, empresas.id)).where(eq(users.email, decoded.email)))
+    
+    
+    c.req.validated_user = {
+        email: data_usuario[0].users.email,
+        name: data_usuario[0].users.name,
+        role: decoded.role,
+        empresa_nombre: data_usuario[0].empresas.name,
+        empresa: data_usuario[0].users.empresaId
+    }
     return {status: 200}
 }

@@ -1,0 +1,81 @@
+<div id="modal-js-example" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <p class="title">{{title}}</p>
+            <p id="mensaje">{{message}}</p>
+            <div class="buttons mt-3 is-pulled-right">
+                <button class="button is-danger" id="btn-action">
+                    {{title}}
+                </button>
+            </div>
+        </div>
+
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+</div>
+
+<script>
+    document
+        .getElementById("btn-action")
+        .addEventListener("click", function () {
+            htmx.ajax("{{method}}", "{{url}}", "#mensaje")
+                .then(() => {
+                    closeAllModals();
+
+                    bulmaToast.toast({
+                        message: "{{title}}",
+                        type: "is-success",
+                        duration: 3000,
+                        dismissible: true,
+                        position: "top-right",
+                        animate: { in: "fadeIn", out: "fadeOut" },
+                    });
+                })
+                .catch((error) => {
+                    bulmaToast.toast({
+                        message: "Error al realizar la acción.",
+                        type: "is-danger",
+                        duration: 3000,
+                        dismissible: true,
+                        position: "top-right",
+                        animate: { in: "fadeIn", out: "fadeOut" },
+                    });
+                });
+        });
+
+    function openModal($el) {
+        $el.classList.add("is-active");
+    }
+
+    function closeModal($el) {
+        $el.classList.remove("is-active");
+    }
+
+    function closeAllModals() {
+        (document.querySelectorAll(".modal") || []).forEach(($modal) => {
+            closeModal($modal);
+        });
+    }
+
+    openModal(document.getElementById("modal-js-example"));
+
+    (
+        document.querySelectorAll(
+            ".modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button",
+        ) || []
+    ).forEach(($close) => {
+        const $target = $close.closest(".modal");
+
+        $close.addEventListener("click", () => {
+            closeModal($target);
+        });
+    });
+
+    // Add a keyboard event to close all modals
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeAllModals();
+        }
+    });
+</script>

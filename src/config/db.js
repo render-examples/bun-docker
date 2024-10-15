@@ -13,6 +13,9 @@ const client = new Client({
 
 await client.connect().then(() => {
     console.log("Connected to the database");
+  })
+  .catch((err) => {
+    console.log("Error connecting to the database", err);
   });
 
 const db = drizzle(client);

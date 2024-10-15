@@ -3,7 +3,7 @@ import { html, raw } from 'hono/html'
 export default function Login() {
     return (html
         `
-            <section class="section">                
+            <section class="section">
                 <div class="container">
                     <div class="columns is-centered">
                         <div class="column is-half">
@@ -25,10 +25,10 @@ export default function Login() {
                                 <div class="field">
                                     <div class="control">
                                         <button class="button is-primary" type="submit"  >Ingresar</button>
-                                    </div>                                  
+                                    </div>
                                 </div>
                             </form>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
             </section>

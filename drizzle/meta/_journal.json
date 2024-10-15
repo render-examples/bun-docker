@@ -57,6 +57,34 @@
       "when": 1718307906790,
       "tag": "0007_smooth_sunspot",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1727139458947,
+      "tag": "0008_hot_mongu",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1728224012270,
+      "tag": "0009_rare_changeling",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1728581187084,
+      "tag": "0010_mixed_onslaught",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1728663881733,
+      "tag": "0011_wet_pepper_potts",
+      "breakpoints": true
     }
   ]
 }

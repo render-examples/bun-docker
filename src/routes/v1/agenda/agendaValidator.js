@@ -23,4 +23,8 @@ const agendaPutValidator = z.object({
     planId: z.string().min(1).max(255).optional()
 });
 
-export { agendaValidator, agendaPutValidator }
+const agendaDeleteValidator = z.object({
+    id: z.string().min(1).max(255)
+});
+
+export { agendaValidator, agendaPutValidator, agendaDeleteValidator }
