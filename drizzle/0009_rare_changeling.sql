@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "empresas" (
 	"rut" text
 );
 --> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "empresaId" integer;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN "empresaId" integer NULL ;--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "users" ADD CONSTRAINT "users_empresaId_empresas_id_fk" FOREIGN KEY ("empresaId") REFERENCES "public"."empresas"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
