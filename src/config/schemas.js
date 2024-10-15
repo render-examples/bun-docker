@@ -24,7 +24,7 @@ export const users = pgTable("users", {
   email: text("email"),
   password: text("password"),
   empresaId: integer("empresaId")
-    .references(() => empresas.id).notNull()
+    .references(() => empresas.id),
   },
   (table) => ({
     empresaUniqueIndex: uniqueIndex("empresaUniqueIndex").on(table.empresaId),
