@@ -22,6 +22,7 @@ const nunjucks_instance = nunjucks.configure(
 v1.use("*", async (c, next) => {
 
   c.db = db;
+  c.nunjucks = nunjucks_instance;
 
   if (!(await c.req.url.includes("auth"))) {  
 
@@ -35,7 +36,6 @@ v1.use("*", async (c, next) => {
     //const data_check = await dataIntegrityMiddleware(c, next);
 
   }
-  c.nunjucks = nunjucks_instance;
 
   return await next();
 });

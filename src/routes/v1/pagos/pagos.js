@@ -4,9 +4,13 @@ import { pagoCreateValidator, pago_response_list_table } from "./validators/pago
 import { uploadFile,getCDNUrl } from "../../../utils/s3";
 import {DocumentoRepository} from "../documentos/documento_repository";
 import { documento, pagos } from "../../../config/schemas";
-import { eq } from "drizzle-orm";
+import { eq, sql} from "drizzle-orm";
 
 const pagos_router = new Hono();
+const moment = require("moment-timezone");
+require("moment/locale/es");
+
+moment.locale("es");
 
 
 pagos_router.get("evento/:evento_id", async (c) => {
@@ -84,5 +88,42 @@ pagos_router.post("/evento/:evento_id", zValidator("form", pagoCreateValidator),
   c.header("HX-Trigger", "reload-payment");
   return c.html("<p> Pago registrado con éxito </p>");
 });
+
+
+pagos_router.get("/grafico", async (c) => {
+
+  const extractMonth = sql`extract(month from date)`;
+  const extractYear = sql`extract(year from date)`;
+
+  const paymentsGroupedByMonth = await c.db
+    .select({
+      year: extractYear.as("year"),
+      month: extractMonth.as("month"),
+      totalAmount: sql`sum(amount)`.as("total_amount"),
+    })
+  .from(pagos)
+  .groupBy(extractYear, extractMonth)
+  .orderBy(extractYear, extractMonth);
+
+  paymentsGroupedByMonth.forEach((item) => {
+    item.month = moment(item.month, "M").format("MMMM");
+  });
+  let data = {
+    data: {
+      x: paymentsGroupedByMonth.map((item)=> item.month),
+      y: paymentsGroupedByMonth.map((item)=> item.totalAmount),
+    },
+    id: "pago-mes-chart",
+    title: "Ingresos por mes",
+    style: "width: 100%; height: 400px;",
+  }
+  
+  console.log(data);
+  c.status(200);
+  return c.html(c.nunjucks.render("utils/echart-layer.html",{chartData:data}));
+
+});
+
+
 
 export { pagos_router };

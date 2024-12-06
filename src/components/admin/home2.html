@@ -1,0 +1,20 @@
+{% import "utils/echart-layer.html" as charts %}
+
+
+<section class="hero is-fullheight">
+    <div class="container">
+        <h1 class="title">Bienvenido al panel de administración</h1>
+        <p class="subtitle">
+            Aqui te mostramos un resumen de la actividad de tu parque!
+        </p>
+
+        <div class="grid">
+            <div class="cell" hx-get="/api/v1/pagos/grafico" hx-trigger="load" hx-target="#chart1">
+                <div id="chart1"></div>
+            </div>
+        </div>
+
+        <div class="grid">
+        </div>
+    </div>
+</section>

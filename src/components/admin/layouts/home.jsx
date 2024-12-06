@@ -19,6 +19,7 @@ export default function AdminLayout({ nav, main }) {
           integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
           crossorigin="anonymous"
         ></script>
+        <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/class-tools.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bulma-toast@2.4.4/dist/bulma-toast.min.js"></script>
