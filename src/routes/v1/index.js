@@ -10,7 +10,8 @@ import { auth_routes } from "./auth";
 import { planes_router } from "./planes/planes";
 import { agenda_router } from "./agenda/agenda";
 import { pagos_router } from "./pagos/pagos";
-import { ne } from "drizzle-orm";
+import { inventario_router } from "./inventario/inventario";
+
 
 const v1 = new Hono();
 const nunjucks_instance = nunjucks.configure(
@@ -45,5 +46,6 @@ v1.route("/planes", planes_router);
 v1.route("/auth", auth_routes);
 v1.route("/agenda", agenda_router);
 v1.route("/pagos", pagos_router);
+v1.route("/inventario", inventario_router);
 
 export { v1 };

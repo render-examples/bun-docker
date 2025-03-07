@@ -33,6 +33,9 @@ export default function Nav() {
                     <a class="navbar-item" href="/admin/planes">
                         Planes
                     </a>
+                    <a class="navbar-item" href="/admin/inventario">
+                        Inventario
+                    </a>
                 </div>
 
                 <div class="navbar-end">

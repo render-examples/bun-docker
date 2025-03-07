@@ -57,6 +57,10 @@ admin_routes.get('/planes', async(c) => {
     
     return c.html(<AdminLayout nav={<Nav/>} main={<Planes/>} />)
 })
+admin_routes.get('/inventario', async(c) => {
+    let page = c.nunjucks.render('inventario/inventario.html')
+    return c.html( <AdminLayout nav={<Nav/>} main={<div dangerouslySetInnerHTML={{__html: page}}/>} />)
+})
 
 
 export { admin_routes }
