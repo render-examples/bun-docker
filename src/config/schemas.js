@@ -49,6 +49,23 @@ export const plans = pgTable("plans", {
   type: text("type"),
 });
 
+export const extras = pgTable("extras", {
+  id: serial("id").primaryKey().notNull(),
+  name: text("name"),
+  price: integer("price"),
+});
+
+export const plans_extras = pgTable("plans_extras", {
+  id: serial("id").notNull().primaryKey(),
+  date: timestamp("fecha").notNull().defaultNow(),
+  planId: integer("planId")
+    .notNull()
+    .references(() => plans.id),
+  extraId: integer("extraId")
+    .notNull()
+    .references(() => extras.id),
+});
+
 export const kids_plans = pgTable("kids_plans", {
   id: serial("id").notNull().primaryKey(),
   kidId: integer("kidId")
@@ -84,6 +101,7 @@ export const pagos = pgTable("pagos", {
   comentario: text("comentario"),
   metodo_pago: text("metodo_pago"),
   eventoId: integer("eventoId").references(() => agenda.id),
+  extraId: integer("extraId").references(() => extras.id)
 });
 
 export const documento = pgTable("documento", {
