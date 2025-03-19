@@ -9,12 +9,12 @@ import { plans } from '../../../config/schemas'
 const planes_router = new Hono()
 
 
-planes_router.post('/', zValidator('json', planValidator) , async c => {
+planes_router.post('/', zValidator('form', planValidator) , async c => {
 
-    let result = await c.db.insert(plans).values(await c.req.json()).returning()
+    let result = await c.db.insert(plans).values(await c.req.valid('form')).returning()
     if(!result) return c.json({message: 'Error al insertar el plan'}, 400)
     
-    c.header('HX-Trigger', 'refreshTable')
+    c.header('HX-Trigger', 'refreshTablePlans')
     c.status(201)
     return c.text('Plan insertado correctamente')
 })
@@ -29,6 +29,24 @@ planes_router.get('/', async c => {
 
     c.header('Content-Type','application/json')
     return c.json(await c.db.select().from(plans))
+})
+
+
+planes_router.get('/table-content', async c => {
+  
+  let data = await c.db.select().from(plans)
+  c.status(200)
+  return c.html(c.nunjucks.render('planes/tabla-planes.html', {plans: data}))
+})
+
+
+planes_router.delete('/:id', async c => {
+    let result = await c.db.delete(plans).where(eq(plans.id, c.req.param('id'))).returning()
+    if(!result) return c.json({message: 'Error al eliminar el plan'}, 400)
+
+    c.header('HX-Trigger', 'refreshTablePlans')
+    c.status(200)
+    return c.text('Plan eliminado correctamente')
 })
 
 

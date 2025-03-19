@@ -55,12 +55,12 @@ export const extras = pgTable("extras", {
   price: integer("price"),
 });
 
-export const plans_extras = pgTable("plans_extras", {
+export const evento_extras = pgTable("evento_extras", {
   id: serial("id").notNull().primaryKey(),
   date: timestamp("fecha").notNull().defaultNow(),
-  planId: integer("planId")
+  eventoId: integer("eventoId")
     .notNull()
-    .references(() => plans.id),
+    .references(() => agenda.id),
   extraId: integer("extraId")
     .notNull()
     .references(() => extras.id),

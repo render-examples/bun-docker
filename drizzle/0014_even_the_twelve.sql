@@ -1,0 +1,1 @@
+ALTER TABLE "plans_extras" RENAME TO "evento_extras";

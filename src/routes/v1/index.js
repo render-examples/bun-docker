@@ -8,6 +8,7 @@ import { db } from "../../config/db";
 import { kids_router } from "./kids";
 import { auth_routes } from "./auth";
 import { planes_router } from "./planes/planes";
+import {extras_router} from "./extras/extras";
 import { agenda_router } from "./agenda/agenda";
 import { pagos_router } from "./pagos/pagos";
 import { inventario_router } from "./inventario/inventario";
@@ -32,7 +33,8 @@ v1.use("*", async (c, next) => {
     if (result.status === 401) {
       c.header("HX-Redirect", "/admin/login");
       c.status(401);
-      return await next();
+      return c.json({ message: "Unauthorized" });
+      //return await next();
     }
     //const data_check = await dataIntegrityMiddleware(c, next);
 
@@ -47,5 +49,6 @@ v1.route("/auth", auth_routes);
 v1.route("/agenda", agenda_router);
 v1.route("/pagos", pagos_router);
 v1.route("/inventario", inventario_router);
+v1.route("/extras", extras_router);
 
 export { v1 };

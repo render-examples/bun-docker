@@ -10,6 +10,7 @@ import { admin_routes } from './routes/v1/admin/login'
 const app = new Hono()
 
 app.use('/logo.png',serveStatic({path: './static/logo.png'}))
+app.use('/main.css',serveStatic({path: './static/main.css'}))
 app.use(logger())
 
 app.get('/', c => {
