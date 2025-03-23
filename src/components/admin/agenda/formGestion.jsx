@@ -18,6 +18,8 @@ export const FormGestion = ({ data }) => {
               id="create-event-form"
               hx-ext="json-enc"
               hx-swap="none"
+              hx-vals="js:{...prepareContent()}"
+              hx-trigger="submit"
               {...(!data
                 ? { "hx-post": "/api/v1/agenda" }
                 : { "hx-put": `/api/v1/agenda/${id}` })}
@@ -39,27 +41,21 @@ export const FormGestion = ({ data }) => {
                         />
                       </div>
                     </div>
+
                     <div class="field">
                       <label class="label">Extras</label>
                       <div class="control">
-                        <div class="select is-multiple"   hx-swap="innerHTML">
-                          <select multiple size="8">
-                            <option value="Argentina">Argentina</option>
-                            <option value="Bolivia">Bolivia</option>
-                            <option value="Brazil">Brazil</option>
-                            <option value="Chile">Chile</option>
-                            <option value="Colombia">Colombia</option>
-                            <option value="Ecuador">Ecuador</option>
-                            <option value="Guyana">Guyana</option>
-                            <option value="Paraguay">Paraguay</option>
-                            <option value="Peru">Peru</option>
-                            <option value="Suriname">Suriname</option>
-                            <option value="Uruguay">Uruguay</option>
-                            <option value="Venezuela">Venezuela</option>
-                          </select>
-                        </div>
+                        <select
+                          hx-get="/api/v1/extras/selector"
+                          hx-swap="innerHTML"
+                          class="js-choice"
+                          hx-trigger="load"
+                          id="extras"
+                          multiple
+                        ></select>
                       </div>
                     </div>
+
                     <div class="field">
                       <label class="label">Descripcion</label>
                       <div class="control">
@@ -216,7 +212,11 @@ export const FormGestion = ({ data }) => {
                 </div>
 
                 <div class="control is-pulled-right">
-                  <button type="submit" class="button is-primary" id="boton-pago">
+                  <button
+                    type="submit"
+                    class="button is-primary"
+                    id="boton-pago"
+                  >
                     Registrar Pago
                   </button>
                 </div>
@@ -229,23 +229,31 @@ export const FormGestion = ({ data }) => {
             <div class="box">
               <h3 class="title">Historial Pagos</h3>
 
-              <table id="payment-table" 
-              class="table is-stripped is-hoverable is-fullwidth"
-              hx-get={`/api/v1/pagos/evento/${id}`}
-              hx-trigger="load,reload-payment from:body"
-              hx-target="#payment-table tbody"
-              hx-ext="json-enc"
+              <table
+                id="payment-table"
+                class="table is-stripped is-hoverable is-fullwidth"
+                hx-get={`/api/v1/pagos/evento/${id}`}
+                hx-trigger="load,reload-payment from:body"
+                hx-target="#payment-table tbody"
+                hx-ext="json-enc"
               >
                 <thead>
                   <tr>
-                    <th><abbr title="Position">Fecha Pago</abbr></th>
-                    <th><abbr title="monto">Monto</abbr></th>
-                    <th><abbr title="Won">Documento</abbr></th>
-                    <th><abbr title="Drawn">Acciones</abbr></th>
+                    <th>
+                      <abbr title="Position">Fecha Pago</abbr>
+                    </th>
+                    <th>
+                      <abbr title="monto">Monto</abbr>
+                    </th>
+                    <th>
+                      <abbr title="Won">Documento</abbr>
+                    </th>
+                    <th>
+                      <abbr title="Drawn">Acciones</abbr>
+                    </th>
                   </tr>
                 </thead>
-                <tbody>                  
-                </tbody>
+                <tbody></tbody>
               </table>
             </div>
           </div>
@@ -256,16 +264,71 @@ export const FormGestion = ({ data }) => {
         id="button-close-modal"
         aria-label="close"
       ></button>
+
+      {html`
+        <script>
+          function prepareContent() {
+            console.log(
+              Array.from(document.querySelector("#extras").selectedOptions).map(
+                (option) => option.value,
+              ),
+            );
+            return {
+              evento: document.querySelector('[name="evento"]').value,
+              descripcion: document.querySelector('[name="descripcion"]').value,
+              numero_contacto: document.querySelector(
+                '[name="numero_contacto"]',
+              ).value,
+              fecha: document.querySelector('[name="fecha"]').value,
+              start: document.querySelector('[name="start"]').value,
+              end: document.querySelector('[name="end"]').value,
+              planId: document.querySelector("#planId").value,
+              extras: Array.from(
+                document.querySelector("#extras").selectedOptions,
+                (option) => option.value,
+              ),
+            };
+          }
+        </script>
+      `}
+
       {html` <script type="module">
         const fileInput = document.querySelector(".file-input");
+
         fileInput.onchange = () => {
-          console.log(fileInput.files);
           if (fileInput.files.length > 0) {
             const fileName = document.querySelector(".file-name");
-            console.log(fileName);
             fileName.textContent = fileInput.files[0].name;
           }
         };
+
+        document
+          .getElementById("extras")
+          .addEventListener("htmx:afterRequest", (evt) => {
+            const elem = document.querySelector(".js-choice");
+            const choices = new Choices(elem, {
+              removeItemButton: true,
+              duplicateItemsAllowed: false,
+              searchResultLimit: 5,
+              searchFields: ["label", "value"],
+              position: "auto",
+              resetScrollPosition: false,
+              shouldSort: false,
+              shouldSortItems: false,
+              searchPlaceholderValue: "Busque una opción",
+              noChoicesText: "No hay opciones para seleccionar",
+              placeholder: true,
+              placeholderValue: "Seleccione una opción",
+              itemSelectText: "Presione para seleccionar",
+              searchEnabled: true,
+              searchChoices: true,
+              searchFloor: 1,
+              searchResultLimit: 4,
+              searchFields: ["label", "value"],
+              position: "auto",
+              resetScrollPosition: false,
+            });
+          });
 
         document
           .getElementById("button-close-modal")
@@ -312,47 +375,74 @@ export const FormGestion = ({ data }) => {
               });
             }
           });
-
+        // document
+        //   .getElementById("create-event-form")
+        //   .addEventListener("htmx:beforeRequest", function (evt) {
+        //     console.log(evt.detail.parameters);
+        //     const form = evt.detail.elt;
+        //     evt.detail.parameters = {
+        //       evento: form.querySelector('[name="evento"]').value,
+        //       descripcion: form.querySelector('[name="descripcion"]').value,
+        //       numero_contacto: form.querySelector('[name="numero_contacto"]')
+        //         .value,
+        //       fecha: form.querySelector('[name="fecha"]').value,
+        //       start: form.querySelector('[name="start"]').value,
+        //       end: form.querySelector('[name="end"]').value,
+        //       planId: form.querySelector("#planId").value,
+        //       extras: Array.from(
+        //         document.querySelector("#extras").selectedOptions,
+        //       ).map((option) => option.value),
+        //     };
+        //     console.log(evt.detail.parameters);
+        //   });
         document.addEventListener("DOMContentLoaded", function () {
           if (document.querySelector("[id^=event-modal-]")) {
             let form = document.getElementById("create-event-form");
             form.removeAttribute("hx-post");
           }
-          
         });
-        
-        function updateMontoRestante(evt=null){ 
 
-            let total_pagos = htmx.find("#total_pagos");
+        function updateMontoRestante(evt = null) {
+          let total_pagos = htmx.find("#total_pagos");
 
-            let input_abono = document.querySelector("[id^=restante-]");
-            let valor_plan = htmx.find("#valor_plan");
-            let final = parseInt(valor_plan.innerText.split(":")[1]) - total_pagos.value
+          let input_abono = document.querySelector("[id^=restante-]");
+          let valor_plan = htmx.find("#valor_plan");
+          let final =
+            parseInt(valor_plan.innerText.split(":")[1]) - total_pagos.value;
 
-            if(evt) final -= parseInt(evt.target.value > 0 ? evt.target.value : 0)
+          if (evt)
+            final -= parseInt(evt.target.value > 0 ? evt.target.value : 0);
 
-            if(final <= 0 && !evt){
-              let input_monto = htmx.find("#abono");
-              input_monto.setAttribute("disabled", true);
-              input_abono.innerHTML = "Pagado";
-              let boton = htmx.find("#boton-pago").setAttribute("disabled", true);
-            }
-            else input_abono.innerHTML = "Monto Restante: " + (final >= 0 ? final : 0);        
+          if (final <= 0 && !evt) {
+            let input_monto = htmx.find("#abono");
+            input_monto.setAttribute("disabled", true);
+            input_abono.innerHTML = "Pagado";
+            let boton = htmx.find("#boton-pago").setAttribute("disabled", true);
+          } else
+            input_abono.innerHTML =
+              "Monto Restante: " + (final >= 0 ? final : 0);
         }
 
-        document.getElementById("payment-table").addEventListener("htmx:afterRequest", (evt) => {
-            if(evt.detail.xhr.status === 200 && evt.detail.xhr.response.length > 0){
-              updateMontoRestante();           
+        document
+          .getElementById("payment-table")
+          .addEventListener("htmx:afterRequest", (evt) => {
+            if (
+              evt.detail.xhr.status === 200 &&
+              evt.detail.xhr.response.length > 0
+            ) {
+              updateMontoRestante();
             }
-        });
+          });
 
-
-        document.getElementById("create-pagos-form").addEventListener("htmx:afterRequest", (evt) => {
-
-          if(evt.detail.xhr.status === 200){
+        document
+          .getElementById("create-pagos-form")
+          .addEventListener("htmx:afterRequest", (evt) => {
             bulmaToast.toast({
-              message: "Pago registrado con éxito.",
-              type: "is-success",
+              message:
+                evt.detail.xhr.status === 200
+                  ? "Pago registrado con éxito."
+                  : "Error al registrar pago.",
+              type: evt.detail.xhr.status === 200 ? "is-success" : "is-danger",
               duration: 3000,
               dismissible: true,
               position: "top-center",
@@ -360,20 +450,7 @@ export const FormGestion = ({ data }) => {
             });
             let elem = htmx.find("#create-pagos-form");
             elem.reset();
-          }
-          else{
-            bulmaToast.toast({
-              message: "Error al registrar pago.",
-              type: "is-danger",
-              duration: 3000,
-              dismissible: true,
-              position: "top-center",
-              animate: { in: "fadeIn", out: "fadeOut" },
-            });
-          }
-        });
-
-
+          });
 
         let abono = document.getElementById("abono");
         abono.addEventListener("keyup", (evt) => {
