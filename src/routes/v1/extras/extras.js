@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { extraPostValidator } from "./validators/extra-validator";
-import { extras } from "../../../config/schemas";
+import { extras, evento_extras } from "../../../config/schemas";
 import { eq } from "drizzle-orm";
+import { ExtrasRepository } from "./ExtrasRepository";
 
 const extras_router = new Hono();
 
@@ -37,9 +38,37 @@ extras_router.delete("/:id", async (c) => {
 });
 
 extras_router.get("/selector", async (c) => {
+  let id = await c.req.param("id");
+
   let result = await c.db.select().from(extras);
   c.status(200);
   return c.html(c.nunjucks.render("extras/tags.html", { extras: result }));
+});
+
+extras_router.get("/selector/evento/:id", async (c) => {
+  let id = await c.req.param("id");
+
+  if (!id) return c.json({ message: "Id de evento no encontrado" }, 404);
+
+  let extraRepo = new ExtrasRepository(c.db);
+  let result = await extraRepo.getByEventId(id);
+
+  result[0].extras.forEach((extra) => {
+    if (
+      result[0].evento_extras.find((e) => {
+        if (e !== null) {
+          return e.extraId === extra.id;
+        }
+      })
+    ) {
+      extra.selected = true;
+    }
+  });
+
+  c.status(200);
+  return c.html(
+    c.nunjucks.render("extras/tags.html", { extras: result[0].extras }),
+  );
 });
 
 export { extras_router };

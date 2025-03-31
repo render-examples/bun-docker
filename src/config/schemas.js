@@ -5,32 +5,31 @@ import {
   primaryKey,
   pgTable,
   timestamp,
-  uniqueIndex
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
-
 
 export const empresas = pgTable("empresas", {
   id: serial("id").primaryKey().notNull(),
   name: text("name"),
-  email: text("email"),  
+  email: text("email"),
   phone: text("phone"),
   address: text("address"),
   rut: text("rut"),
 });
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey().notNull(),
-  name: text("name"),
-  email: text("email"),
-  password: text("password"),
-  empresaId: integer("empresaId")
-    .references(() => empresas.id),
+export const users = pgTable(
+  "users",
+  {
+    id: serial("id").primaryKey().notNull(),
+    name: text("name"),
+    email: text("email"),
+    password: text("password"),
+    empresaId: integer("empresaId").references(() => empresas.id),
   },
   (table) => ({
     empresaUniqueIndex: uniqueIndex("empresaUniqueIndex").on(table.empresaId),
-  })
-  
-  );
+  }),
+);
 
 export const kids = pgTable("kids", {
   id: serial("id").primaryKey().notNull(),
@@ -101,7 +100,7 @@ export const pagos = pgTable("pagos", {
   comentario: text("comentario"),
   metodo_pago: text("metodo_pago"),
   eventoId: integer("eventoId").references(() => agenda.id),
-  extraId: integer("extraId").references(() => extras.id)
+  extraId: integer("extraId").references(() => extras.id),
 });
 
 export const documento = pgTable("documento", {

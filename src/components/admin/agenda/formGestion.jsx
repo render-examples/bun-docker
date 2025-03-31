@@ -18,11 +18,10 @@ export const FormGestion = ({ data }) => {
               id="create-event-form"
               hx-ext="json-enc"
               hx-swap="none"
-              hx-vals="js:{...prepareContent()}"
-              hx-trigger="submit"
-              {...(!data
-                ? { "hx-post": "/api/v1/agenda" }
-                : { "hx-put": `/api/v1/agenda/${id}` })}
+              hx-on:submit="prepareContent(event)"
+              hx-trigger="submit, fireSubmit"
+              data-method={id ? "put" : "post"}
+              data-url={id ? `/api/v1/agenda/${id}` : "/api/v1/agenda"}
             >
               <div class="box">
                 <div class="columns">
@@ -46,11 +45,15 @@ export const FormGestion = ({ data }) => {
                       <label class="label">Extras</label>
                       <div class="control">
                         <select
-                          hx-get="/api/v1/extras/selector"
+                          {...(id
+                            ? {
+                                "hx-get": `/api/v1/extras/selector/evento/${id}`,
+                              }
+                            : { "hx-get": `/api/v1/extras/selector` })}
                           hx-swap="innerHTML"
                           class="js-choice"
                           hx-trigger="load"
-                          id="extras"
+                          name="extras"
                           multiple
                         ></select>
                       </div>
@@ -96,7 +99,7 @@ export const FormGestion = ({ data }) => {
                           class="input"
                           type="date"
                           name="fecha"
-                          id="event-start"
+                          id="event-fecha"
                           value={data ? data.agenda.fecha : ""}
                           required
                         />
@@ -109,7 +112,7 @@ export const FormGestion = ({ data }) => {
                           class="input"
                           type="time"
                           name="start"
-                          id="event-end"
+                          id="event-start"
                           value={data ? data.agenda.start : ""}
                           required
                         />
@@ -267,27 +270,42 @@ export const FormGestion = ({ data }) => {
 
       {html`
         <script>
-          function prepareContent() {
-            console.log(
-              Array.from(document.querySelector("#extras").selectedOptions).map(
-                (option) => option.value,
-              ),
-            );
-            return {
-              evento: document.querySelector('[name="evento"]').value,
-              descripcion: document.querySelector('[name="descripcion"]').value,
-              numero_contacto: document.querySelector(
-                '[name="numero_contacto"]',
-              ).value,
-              fecha: document.querySelector('[name="fecha"]').value,
-              start: document.querySelector('[name="start"]').value,
-              end: document.querySelector('[name="end"]').value,
-              planId: document.querySelector("#planId").value,
-              extras: Array.from(
-                document.querySelector("#extras").selectedOptions,
-                (option) => option.value,
-              ),
+          // Esto se debe re factorizar, ya que se opto por enviar los extras
+          // haciendo append a un string, lo cual no requiere todo este codigo
+          // sino solamente usar hx-vals en el form
+          function prepareContent(evt) {
+            evt.preventDefault();
+
+            const form = evt.target;
+
+            const body = {
+              evento: form.querySelector('[name="evento"]').value,
+              descripcion: form.querySelector('[name="descripcion"]').value,
+              numero_contacto: form.querySelector('[name="numero_contacto"]')
+                .value,
+              fecha: form.querySelector("[name=fecha]").value,
+              start: form.querySelector("[name=start]").value,
+              end: form.querySelector("[name=end]").value,
+              planId: form.querySelector("#planId").value,
             };
+
+            let extras = form.querySelector(".js-choice");
+            console.log(extras.selectedOptions);
+            let extras_string = "";
+            Array.from(extras.selectedOptions).forEach((extra) => {
+              if (extra.selected) extras_string += extra.value + ",";
+            });
+            body.extras = extras_string;
+
+            let method = form.getAttribute("data-method");
+            let url = form.getAttribute("data-url");
+
+            form.setAttribute("hx-vals", JSON.stringify(body));
+            form.setAttribute("hx-" + method, url);
+            htmx.process(form);
+            htmx.trigger(form, "fireSubmit");
+
+            return false;
           }
         </script>
       `}
@@ -303,7 +321,7 @@ export const FormGestion = ({ data }) => {
         };
 
         document
-          .getElementById("extras")
+          .querySelector("[name=extras]")
           .addEventListener("htmx:afterRequest", (evt) => {
             const elem = document.querySelector(".js-choice");
             const choices = new Choices(elem, {
@@ -375,26 +393,7 @@ export const FormGestion = ({ data }) => {
               });
             }
           });
-        // document
-        //   .getElementById("create-event-form")
-        //   .addEventListener("htmx:beforeRequest", function (evt) {
-        //     console.log(evt.detail.parameters);
-        //     const form = evt.detail.elt;
-        //     evt.detail.parameters = {
-        //       evento: form.querySelector('[name="evento"]').value,
-        //       descripcion: form.querySelector('[name="descripcion"]').value,
-        //       numero_contacto: form.querySelector('[name="numero_contacto"]')
-        //         .value,
-        //       fecha: form.querySelector('[name="fecha"]').value,
-        //       start: form.querySelector('[name="start"]').value,
-        //       end: form.querySelector('[name="end"]').value,
-        //       planId: form.querySelector("#planId").value,
-        //       extras: Array.from(
-        //         document.querySelector("#extras").selectedOptions,
-        //       ).map((option) => option.value),
-        //     };
-        //     console.log(evt.detail.parameters);
-        //   });
+
         document.addEventListener("DOMContentLoaded", function () {
           if (document.querySelector("[id^=event-modal-]")) {
             let form = document.getElementById("create-event-form");
