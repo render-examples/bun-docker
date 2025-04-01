@@ -115,10 +115,10 @@ agenda_router.put("/:id", zValidator("json", agendaPutValidator), async (c) => {
   let { data, extras } = await c.req.valid("json");
   let extraRepo = new ExtrasRepository(c.db);
   let eventoRepo = new EventosRepository(c.db);
-
+  console.log(data,extras)
   try {
     await c.db.transaction(async (trx) => {
-      await eventoRepo.put(data);
+      await eventoRepo.put(id, data);
       await extraRepo.deleteByEventId(id);
 
       if (extras.length > 0) {

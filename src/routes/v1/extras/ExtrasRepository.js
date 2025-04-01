@@ -32,7 +32,8 @@ class ExtrasRepository {
         evento_extras: sql`JSON_AGG(${evento_extras})`,
       })
       .from(extras)
-      .leftJoin(evento_extras, eq(evento_extras.eventoId, eventId));
+      .leftJoin(evento_extras, eq(evento_extras.eventoId, eventId))
+      .where(eq(evento_extras.eventoId, eventId))
   }
 }
 

@@ -289,7 +289,7 @@ export const FormGestion = ({ data }) => {
               planId: form.querySelector("#planId").value,
             };
 
-            let extras = form.querySelector(".js-choice");
+            let extras = form.querySelector("[name=extras]");
             console.log(extras.selectedOptions);
             let extras_string = "";
             Array.from(extras.selectedOptions).forEach((extra) => {
@@ -392,12 +392,18 @@ export const FormGestion = ({ data }) => {
                 animate: { in: "fadeIn", out: "fadeOut" },
               });
             }
+              
+            const selector = document.querySelector(".js-choice");
+            if (selector.choices) {
+              selector.destroy();
+            }
           });
 
         document.addEventListener("DOMContentLoaded", function () {
           if (document.querySelector("[id^=event-modal-]")) {
             let form = document.getElementById("create-event-form");
             form.removeAttribute("hx-post");
+
           }
         });
 
