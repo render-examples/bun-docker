@@ -11,7 +11,7 @@ class ExtrasRepository {
   }
 
   calculateTotalPrice(data) {
-    if (len(data) > 0) return data.reduce((acc, item) => acc + item.price, 0);
+    if (data.length > 0) return data.reduce((acc, item) => acc + item.price, 0);
     return 0;
   }
 
