@@ -10,6 +10,10 @@ class ExtrasRepository {
     return await this.context.db.insert(extras).values(data).returning();
   }
 
+  calculateTotalPrice(data) {
+    return data.reduce((acc, item) => acc + item.price, 0);
+  }
+
   async put(data) {
     return await this.context.update(extras).set(data);
   }
@@ -28,12 +32,12 @@ class ExtrasRepository {
   async getByEventId(eventId) {
     return await this.context
       .select({
-        extras: sql`JSON_AGG(${extras})`,
-        evento_extras: sql`JSON_AGG(${evento_extras})`,
+        extras: sql`JSON_AGG(DISTINCT ${extras})`,
+        evento_extras: sql`JSON_AGG(DISTINCT ${evento_extras})`,
       })
       .from(extras)
       .leftJoin(evento_extras, eq(evento_extras.eventoId, eventId))
-      .where(eq(evento_extras.eventoId, eventId))
+      .where(eq(evento_extras.eventoId, eventId));
   }
 }
 

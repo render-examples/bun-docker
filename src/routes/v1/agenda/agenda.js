@@ -84,12 +84,14 @@ agenda_router.get("/", async (c) => {
 
 agenda_router.get("/form/:id?", async (c) => {
   let id = await c.req.param("id");
+  let extra_repo = new ExtrasRepository(c.db);
+
   let data = await c.db
     .select({
       agenda: agenda,
       plans: plans,
-      pagos: sql`JSON_AGG(${pagos})`,
-      extras: sql`JSON_AGG(${extras})`,
+      pagos: sql`JSON_AGG(DISTINCT ${pagos})`,
+      extras: sql`JSON_AGG(DISTINCT ${extras})`,
     })
     .from(agenda)
     .where(eq(agenda.id, id))
@@ -103,6 +105,7 @@ agenda_router.get("/form/:id?", async (c) => {
     data[0].agenda.fecha = moment(data[0].agenda.fecha).format("YYYY-MM-DD");
     data[0].agenda.start = moment(data[0].agenda.start).format("HH:mm");
     data[0].agenda.end = moment(data[0].agenda.end).format("HH:mm");
+    data[0].extra_total_value = extra_repo.calculateTotalPrice(data[0].extras);
   }
 
   c.header("Content-Type", "text/html");
@@ -115,7 +118,7 @@ agenda_router.put("/:id", zValidator("json", agendaPutValidator), async (c) => {
   let { data, extras } = await c.req.valid("json");
   let extraRepo = new ExtrasRepository(c.db);
   let eventoRepo = new EventosRepository(c.db);
-  console.log(data,extras)
+  console.log(data, extras);
   try {
     await c.db.transaction(async (trx) => {
       await eventoRepo.put(id, data);

@@ -142,7 +142,27 @@ export const FormGestion = ({ data }) => {
               </div>
             </form>
           </div>
-          <div class="column is-4">
+
+          <div
+            class="column is-4"
+            x-cloak
+            x-init
+            x-data={`{ total_a_pagar:0, abono: 0, total_pagos:0,
+              calcularRestante(){
+                return this.total_a_pagar - this.total_pagos - this.abono
+              },
+              init(){
+               this.total_a_pagar = ${data.extra_total_value || 0} + ${data.plans.price || 0}
+               document
+                .getElementById("payment-table")
+                .addEventListener("htmx:afterRequest", (evt) => {
+                  if (evt.detail.xhr.response.length > 0) {
+                    this.total_pagos = htmx.find('#total_pagos').value
+                  }
+                });
+                }
+              }`}
+          >
             <div class="box">
               <h3 class="title">Pagos</h3>
               <form
@@ -157,36 +177,38 @@ export const FormGestion = ({ data }) => {
                 <div class="columns">
                   <div class="column is-6">
                     <div class="field">
-                      <label class="label">Monto a Pagar</label>
+                      <label class="label">Pagar Evento</label>
                       <div class="control">
                         <input
                           class="input"
+                          x-model="abono"
                           type="number"
                           name="amount"
+                          x-bind:disabled="total_pagos == total_a_pagar"
                           id="abono"
                           min="0"
                         />
                       </div>
                     </div>
                   </div>
-                  <div class="column is-6">
-                    {data
-                      ? html`
-                          <div class="field">
-                            <div class="mt-4">
-                              <label class="label" id="valor_plan"
-                                >Valor Plan: ${data.plans.price}</label
-                              >
-                              <label
-                                class="label"
-                                id="restante-${data.agenda.id}"
-                              ></label>
-                            </div>
-                          </div>
-                        `
-                      : ""}
+                  <div class="column is-6" x-show="total_a_pagar">
+                    <div class="field">
+                      <div class="mt-4">
+                        <label
+                          class="label"
+                          id="valor_plan"
+                          x-text="'Total a Pagar (Evento + Extras): \n'+ total_a_pagar"
+                        ></label>
+                        <label
+                          class="label"
+                          x-text="'Restante: '+ calcularRestante()"
+                          id="restante-${data.agenda.id}"
+                        ></label>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
                 <div class="columns">
                   <div class="column is-12">
                     <div class="field">
@@ -198,6 +220,7 @@ export const FormGestion = ({ data }) => {
                               class="file-input"
                               type="file"
                               name="documentos"
+                              x-bind:disabled="total_pagos == total_a_pagar"
                               multiple
                             />
                             <span class="file-cta">
@@ -218,6 +241,7 @@ export const FormGestion = ({ data }) => {
                   <button
                     type="submit"
                     class="button is-primary"
+                    x-bind:disabled="total_pagos == total_a_pagar"
                     id="boton-pago"
                   >
                     Registrar Pago
@@ -290,7 +314,6 @@ export const FormGestion = ({ data }) => {
             };
 
             let extras = form.querySelector("[name=extras]");
-            console.log(extras.selectedOptions);
             let extras_string = "";
             Array.from(extras.selectedOptions).forEach((extra) => {
               if (extra.selected) extras_string += extra.value + ",";
@@ -312,6 +335,7 @@ export const FormGestion = ({ data }) => {
 
       {html` <script type="module">
         const fileInput = document.querySelector(".file-input");
+        let choices = [];
 
         fileInput.onchange = () => {
           if (fileInput.files.length > 0) {
@@ -324,7 +348,7 @@ export const FormGestion = ({ data }) => {
           .querySelector("[name=extras]")
           .addEventListener("htmx:afterRequest", (evt) => {
             const elem = document.querySelector(".js-choice");
-            const choices = new Choices(elem, {
+            choices = new Choices(elem, {
               removeItemButton: true,
               duplicateItemsAllowed: false,
               searchResultLimit: 5,
@@ -366,6 +390,7 @@ export const FormGestion = ({ data }) => {
               let form = document.querySelector("[id^=event-modal]");
               form.classList.remove("is-active");
               form.remove();
+
               bulmaToast.toast({
                 message: "Evento creado.",
                 type: "is-success",
@@ -392,18 +417,12 @@ export const FormGestion = ({ data }) => {
                 animate: { in: "fadeIn", out: "fadeOut" },
               });
             }
-              
-            const selector = document.querySelector(".js-choice");
-            if (selector.choices) {
-              selector.destroy();
-            }
           });
 
         document.addEventListener("DOMContentLoaded", function () {
           if (document.querySelector("[id^=event-modal-]")) {
             let form = document.getElementById("create-event-form");
             form.removeAttribute("hx-post");
-
           }
         });
 
@@ -429,17 +448,6 @@ export const FormGestion = ({ data }) => {
         }
 
         document
-          .getElementById("payment-table")
-          .addEventListener("htmx:afterRequest", (evt) => {
-            if (
-              evt.detail.xhr.status === 200 &&
-              evt.detail.xhr.response.length > 0
-            ) {
-              updateMontoRestante();
-            }
-          });
-
-        document
           .getElementById("create-pagos-form")
           .addEventListener("htmx:afterRequest", (evt) => {
             bulmaToast.toast({
@@ -457,10 +465,10 @@ export const FormGestion = ({ data }) => {
             elem.reset();
           });
 
-        let abono = document.getElementById("abono");
-        abono.addEventListener("keyup", (evt) => {
-          updateMontoRestante(evt);
-        });
+        // let abono = document.getElementById("abono");
+        // abono.addEventListener("keyup", (evt) => {
+        //   updateMontoRestante(evt);
+        // });
       </script>`}
     </div>
   );
