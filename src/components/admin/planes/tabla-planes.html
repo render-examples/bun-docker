@@ -1,0 +1,11 @@
+{% for plan in plans %}
+<tr>
+  <td>{{plan.name}}</td>
+  <td>{{plan.price}}</td>
+  <td>{{plan.duration}}</td>
+    <td>
+    <button class="button is-danger" hx-delete="/api/v1/planes/{{plan.id}}">Eliminar</button>
+    </td>
+</tr>
+{% endfor %}
+

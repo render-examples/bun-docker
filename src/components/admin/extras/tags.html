@@ -1,0 +1,15 @@
+{% for item in extras %}
+<option
+    {%
+    if
+    item.selected
+    %}
+    selected="selected"
+    {%
+    endif
+    %}
+    value="{{ item.id }}"
+>
+    {{ item.name }}
+</option>
+{% endfor %}

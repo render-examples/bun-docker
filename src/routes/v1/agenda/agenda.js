@@ -1,14 +1,22 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { serveStatic } from "hono/bun";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
+import { ExtrasRepository } from "../extras/ExtrasRepository";
+import { EventosRepository } from "./EventoRepository";
 import {
   agendaValidator,
   agendaPutValidator,
   agendaDeleteValidator,
 } from "./agendaValidator";
-import { agenda, pagos, plans } from "../../../config/schemas";
+import {
+  agenda,
+  pagos,
+  plans,
+  evento_extras,
+  extras,
+} from "../../../config/schemas";
 import {
   dateStringToTimestamp,
   timeStringToTimestamp,
@@ -35,8 +43,23 @@ agenda_router.post("/", zValidator("json", agendaValidator), async (c) => {
   data.start = timeStringToTimestamp(data.start);
   data.end = timeStringToTimestamp(data.end);
 
-  let result = await c.db.insert(agenda).values(data).returning();
-  if (!result) return c.text("Error al insertar la agenda", 400);
+  let extraRepo = new ExtrasRepository(c.db);
+  let cadena_extras = data.extras.split(",");
+  cadena_extras.pop();
+
+  c.db.transaction(async (trx) => {
+    let insert_evento = await c.db.insert(agenda).values(data).returning();
+    if (!insert_evento) return c.text("Error al insertar la agenda", 500);
+
+    if (cadena_extras.length > 0) {
+      let extras = await extraRepo.insertMany(
+        cadena_extras.map((extra) => {
+          return { eventoId: insert_evento[0].id, extraId: extra };
+        }),
+      );
+      if (!extras) return c.text("Error al insertar los extras", 500);
+    }
+  });
 
   c.header("HX-Trigger", "refreshCalendar");
   c.status(201);
@@ -61,17 +84,28 @@ agenda_router.get("/", async (c) => {
 
 agenda_router.get("/form/:id?", async (c) => {
   let id = await c.req.param("id");
+  let extra_repo = new ExtrasRepository(c.db);
+
   let data = await c.db
-    .select()
+    .select({
+      agenda: agenda,
+      plans: plans,
+      pagos: sql`JSON_AGG(DISTINCT ${pagos})`,
+      extras: sql`JSON_AGG(DISTINCT ${extras})`,
+    })
     .from(agenda)
     .where(eq(agenda.id, id))
     .innerJoin(plans, eq(agenda.planId, plans.id))
-    .leftJoin(pagos, eq(plans.id, pagos.planId));
+    .leftJoin(pagos, eq(plans.id, pagos.planId))
+    .leftJoin(evento_extras, eq(agenda.id, evento_extras.eventoId))
+    .leftJoin(extras, eq(evento_extras.extraId, extras.id))
+    .groupBy(agenda.id, plans.id);
 
   if (data.length > 0) {
     data[0].agenda.fecha = moment(data[0].agenda.fecha).format("YYYY-MM-DD");
     data[0].agenda.start = moment(data[0].agenda.start).format("HH:mm");
     data[0].agenda.end = moment(data[0].agenda.end).format("HH:mm");
+    data[0].extra_total_value = extra_repo.calculateTotalPrice(data[0].extras);
   }
 
   c.header("Content-Type", "text/html");
@@ -81,18 +115,27 @@ agenda_router.get("/form/:id?", async (c) => {
 
 agenda_router.put("/:id", zValidator("json", agendaPutValidator), async (c) => {
   let id = await c.req.param("id");
-  let data = await c.req.json();
+  let { data, extras } = await c.req.valid("json");
+  let extraRepo = new ExtrasRepository(c.db);
+  let eventoRepo = new EventosRepository(c.db);
+  console.log(data, extras);
+  try {
+    await c.db.transaction(async (trx) => {
+      await eventoRepo.put(id, data);
+      await extraRepo.deleteByEventId(id);
 
-  data.fecha = dateStringToTimestamp(data.fecha);
-  data.start = timeStringToTimestamp(data.start);
-  data.end = timeStringToTimestamp(data.end);
-
-  let result = await c.db
-    .update(agenda)
-    .set(data)
-    .where(eq(agenda.id, id))
-    .returning();
-  if (!result) return c.text("Error al actualizar la agenda", 400);
+      if (extras.length > 0) {
+        let extra_result = await extraRepo.insertMany(
+          extras.map((extra) => {
+            return { eventoId: id, extraId: extra };
+          }),
+        );
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return c.text("Error al actualizar la agenda", 500);
+  }
 
   c.header("HX-Trigger", "refreshCalendar");
   c.status(200);

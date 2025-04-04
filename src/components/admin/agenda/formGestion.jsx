@@ -18,9 +18,10 @@ export const FormGestion = ({ data }) => {
               id="create-event-form"
               hx-ext="json-enc"
               hx-swap="none"
-              {...(!data
-                ? { "hx-post": "/api/v1/agenda" }
-                : { "hx-put": `/api/v1/agenda/${id}` })}
+              hx-on:submit="prepareContent(event)"
+              hx-trigger="submit, fireSubmit"
+              data-method={id ? "put" : "post"}
+              data-url={id ? `/api/v1/agenda/${id}` : "/api/v1/agenda"}
             >
               <div class="box">
                 <div class="columns">
@@ -39,6 +40,25 @@ export const FormGestion = ({ data }) => {
                         />
                       </div>
                     </div>
+
+                    <div class="field">
+                      <label class="label">Extras</label>
+                      <div class="control">
+                        <select
+                          {...(id
+                            ? {
+                                "hx-get": `/api/v1/extras/selector/evento/${id}`,
+                              }
+                            : { "hx-get": `/api/v1/extras/selector` })}
+                          hx-swap="innerHTML"
+                          class="js-choice"
+                          hx-trigger="load"
+                          name="extras"
+                          multiple
+                        ></select>
+                      </div>
+                    </div>
+
                     <div class="field">
                       <label class="label">Descripcion</label>
                       <div class="control">
@@ -79,7 +99,7 @@ export const FormGestion = ({ data }) => {
                           class="input"
                           type="date"
                           name="fecha"
-                          id="event-start"
+                          id="event-fecha"
                           value={data ? data.agenda.fecha : ""}
                           required
                         />
@@ -92,7 +112,7 @@ export const FormGestion = ({ data }) => {
                           class="input"
                           type="time"
                           name="start"
-                          id="event-end"
+                          id="event-start"
                           value={data ? data.agenda.start : ""}
                           required
                         />
@@ -122,7 +142,27 @@ export const FormGestion = ({ data }) => {
               </div>
             </form>
           </div>
-          <div class="column is-4">
+
+          <div
+            class="column is-4"
+            x-cloak
+            x-init
+            x-data={`{ total_a_pagar:0, abono: 0, total_pagos:0,
+              calcularRestante(){
+                return this.total_a_pagar - this.total_pagos - this.abono
+              },
+              init(){
+               this.total_a_pagar = ${data.extra_total_value || 0} + ${data.plans.price || 0}
+               document
+                .getElementById("payment-table")
+                .addEventListener("htmx:afterRequest", (evt) => {
+                  if (evt.detail.xhr.response.length > 0) {
+                    this.total_pagos = htmx.find('#total_pagos').value
+                  }
+                });
+                }
+              }`}
+          >
             <div class="box">
               <h3 class="title">Pagos</h3>
               <form
@@ -137,36 +177,38 @@ export const FormGestion = ({ data }) => {
                 <div class="columns">
                   <div class="column is-6">
                     <div class="field">
-                      <label class="label">Monto a Pagar</label>
+                      <label class="label">Pagar Evento</label>
                       <div class="control">
                         <input
                           class="input"
+                          x-model="abono"
                           type="number"
                           name="amount"
+                          x-bind:disabled="total_pagos == total_a_pagar"
                           id="abono"
                           min="0"
                         />
                       </div>
                     </div>
                   </div>
-                  <div class="column is-6">
-                    {data
-                      ? html`
-                          <div class="field">
-                            <div class="mt-4">
-                              <label class="label" id="valor_plan"
-                                >Valor Plan: ${data.plans.price}</label
-                              >
-                              <label
-                                class="label"
-                                id="restante-${data.agenda.id}"
-                              ></label>
-                            </div>
-                          </div>
-                        `
-                      : ""}
+                  <div class="column is-6" x-show="total_a_pagar">
+                    <div class="field">
+                      <div class="mt-4">
+                        <label
+                          class="label"
+                          id="valor_plan"
+                          x-text="'Total a Pagar (Evento + Extras): \n'+ total_a_pagar"
+                        ></label>
+                        <label
+                          class="label"
+                          x-text="'Restante: '+ calcularRestante()"
+                          id="restante-${data.agenda.id}"
+                        ></label>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
                 <div class="columns">
                   <div class="column is-12">
                     <div class="field">
@@ -178,6 +220,7 @@ export const FormGestion = ({ data }) => {
                               class="file-input"
                               type="file"
                               name="documentos"
+                              x-bind:disabled="total_pagos == total_a_pagar"
                               multiple
                             />
                             <span class="file-cta">
@@ -195,7 +238,12 @@ export const FormGestion = ({ data }) => {
                 </div>
 
                 <div class="control is-pulled-right">
-                  <button type="submit" class="button is-primary" id="boton-pago">
+                  <button
+                    type="submit"
+                    class="button is-primary"
+                    x-bind:disabled="total_pagos == total_a_pagar"
+                    id="boton-pago"
+                  >
                     Registrar Pago
                   </button>
                 </div>
@@ -208,23 +256,31 @@ export const FormGestion = ({ data }) => {
             <div class="box">
               <h3 class="title">Historial Pagos</h3>
 
-              <table id="payment-table" 
-              class="table is-stripped is-hoverable is-fullwidth"
-              hx-get={`/api/v1/pagos/evento/${id}`}
-              hx-trigger="load,reload-payment from:body"
-              hx-target="#payment-table tbody"
-              hx-ext="json-enc"
+              <table
+                id="payment-table"
+                class="table is-stripped is-hoverable is-fullwidth"
+                hx-get={`/api/v1/pagos/evento/${id}`}
+                hx-trigger="load,reload-payment from:body"
+                hx-target="#payment-table tbody"
+                hx-ext="json-enc"
               >
                 <thead>
                   <tr>
-                    <th><abbr title="Position">Fecha Pago</abbr></th>
-                    <th><abbr title="monto">Monto</abbr></th>
-                    <th><abbr title="Won">Documento</abbr></th>
-                    <th><abbr title="Drawn">Acciones</abbr></th>
+                    <th>
+                      <abbr title="Position">Fecha Pago</abbr>
+                    </th>
+                    <th>
+                      <abbr title="monto">Monto</abbr>
+                    </th>
+                    <th>
+                      <abbr title="Won">Documento</abbr>
+                    </th>
+                    <th>
+                      <abbr title="Drawn">Acciones</abbr>
+                    </th>
                   </tr>
                 </thead>
-                <tbody>                  
-                </tbody>
+                <tbody></tbody>
               </table>
             </div>
           </div>
@@ -235,16 +291,86 @@ export const FormGestion = ({ data }) => {
         id="button-close-modal"
         aria-label="close"
       ></button>
+
+      {html`
+        <script>
+          // Esto se debe re factorizar, ya que se opto por enviar los extras
+          // haciendo append a un string, lo cual no requiere todo este codigo
+          // sino solamente usar hx-vals en el form
+          function prepareContent(evt) {
+            evt.preventDefault();
+
+            const form = evt.target;
+
+            const body = {
+              evento: form.querySelector('[name="evento"]').value,
+              descripcion: form.querySelector('[name="descripcion"]').value,
+              numero_contacto: form.querySelector('[name="numero_contacto"]')
+                .value,
+              fecha: form.querySelector("[name=fecha]").value,
+              start: form.querySelector("[name=start]").value,
+              end: form.querySelector("[name=end]").value,
+              planId: form.querySelector("#planId").value,
+            };
+
+            let extras = form.querySelector("[name=extras]");
+            let extras_string = "";
+            Array.from(extras.selectedOptions).forEach((extra) => {
+              if (extra.selected) extras_string += extra.value + ",";
+            });
+            body.extras = extras_string;
+
+            let method = form.getAttribute("data-method");
+            let url = form.getAttribute("data-url");
+
+            form.setAttribute("hx-vals", JSON.stringify(body));
+            form.setAttribute("hx-" + method, url);
+            htmx.process(form);
+            htmx.trigger(form, "fireSubmit");
+
+            return false;
+          }
+        </script>
+      `}
+
       {html` <script type="module">
         const fileInput = document.querySelector(".file-input");
+        let choices = [];
+
         fileInput.onchange = () => {
-          console.log(fileInput.files);
           if (fileInput.files.length > 0) {
             const fileName = document.querySelector(".file-name");
-            console.log(fileName);
             fileName.textContent = fileInput.files[0].name;
           }
         };
+
+        document
+          .querySelector("[name=extras]")
+          .addEventListener("htmx:afterRequest", (evt) => {
+            const elem = document.querySelector(".js-choice");
+            choices = new Choices(elem, {
+              removeItemButton: true,
+              duplicateItemsAllowed: false,
+              searchResultLimit: 5,
+              searchFields: ["label", "value"],
+              position: "auto",
+              resetScrollPosition: false,
+              shouldSort: false,
+              shouldSortItems: false,
+              searchPlaceholderValue: "Busque una opción",
+              noChoicesText: "No hay opciones para seleccionar",
+              placeholder: true,
+              placeholderValue: "Seleccione una opción",
+              itemSelectText: "Presione para seleccionar",
+              searchEnabled: true,
+              searchChoices: true,
+              searchFloor: 1,
+              searchResultLimit: 4,
+              searchFields: ["label", "value"],
+              position: "auto",
+              resetScrollPosition: false,
+            });
+          });
 
         document
           .getElementById("button-close-modal")
@@ -264,6 +390,7 @@ export const FormGestion = ({ data }) => {
               let form = document.querySelector("[id^=event-modal]");
               form.classList.remove("is-active");
               form.remove();
+
               bulmaToast.toast({
                 message: "Evento creado.",
                 type: "is-success",
@@ -297,41 +424,38 @@ export const FormGestion = ({ data }) => {
             let form = document.getElementById("create-event-form");
             form.removeAttribute("hx-post");
           }
-          
         });
-        
-        function updateMontoRestante(evt=null){ 
 
-            let total_pagos = htmx.find("#total_pagos");
+        function updateMontoRestante(evt = null) {
+          let total_pagos = htmx.find("#total_pagos");
 
-            let input_abono = document.querySelector("[id^=restante-]");
-            let valor_plan = htmx.find("#valor_plan");
-            let final = parseInt(valor_plan.innerText.split(":")[1]) - total_pagos.value
+          let input_abono = document.querySelector("[id^=restante-]");
+          let valor_plan = htmx.find("#valor_plan");
+          let final =
+            parseInt(valor_plan.innerText.split(":")[1]) - total_pagos.value;
 
-            if(evt) final -= parseInt(evt.target.value > 0 ? evt.target.value : 0)
+          if (evt)
+            final -= parseInt(evt.target.value > 0 ? evt.target.value : 0);
 
-            if(final <= 0 && !evt){
-              let input_monto = htmx.find("#abono");
-              input_monto.setAttribute("disabled", true);
-              input_abono.innerHTML = "Pagado";
-              let boton = htmx.find("#boton-pago").setAttribute("disabled", true);
-            }
-            else input_abono.innerHTML = "Monto Restante: " + (final >= 0 ? final : 0);        
+          if (final <= 0 && !evt) {
+            let input_monto = htmx.find("#abono");
+            input_monto.setAttribute("disabled", true);
+            input_abono.innerHTML = "Pagado";
+            let boton = htmx.find("#boton-pago").setAttribute("disabled", true);
+          } else
+            input_abono.innerHTML =
+              "Monto Restante: " + (final >= 0 ? final : 0);
         }
 
-        document.getElementById("payment-table").addEventListener("htmx:afterRequest", (evt) => {
-            if(evt.detail.xhr.status === 200 && evt.detail.xhr.response.length > 0){
-              updateMontoRestante();           
-            }
-        });
-
-
-        document.getElementById("create-pagos-form").addEventListener("htmx:afterRequest", (evt) => {
-
-          if(evt.detail.xhr.status === 200){
+        document
+          .getElementById("create-pagos-form")
+          .addEventListener("htmx:afterRequest", (evt) => {
             bulmaToast.toast({
-              message: "Pago registrado con éxito.",
-              type: "is-success",
+              message:
+                evt.detail.xhr.status === 200
+                  ? "Pago registrado con éxito."
+                  : "Error al registrar pago.",
+              type: evt.detail.xhr.status === 200 ? "is-success" : "is-danger",
               duration: 3000,
               dismissible: true,
               position: "top-center",
@@ -339,25 +463,12 @@ export const FormGestion = ({ data }) => {
             });
             let elem = htmx.find("#create-pagos-form");
             elem.reset();
-          }
-          else{
-            bulmaToast.toast({
-              message: "Error al registrar pago.",
-              type: "is-danger",
-              duration: 3000,
-              dismissible: true,
-              position: "top-center",
-              animate: { in: "fadeIn", out: "fadeOut" },
-            });
-          }
-        });
+          });
 
-
-
-        let abono = document.getElementById("abono");
-        abono.addEventListener("keyup", (evt) => {
-          updateMontoRestante(evt);
-        });
+        // let abono = document.getElementById("abono");
+        // abono.addEventListener("keyup", (evt) => {
+        //   updateMontoRestante(evt);
+        // });
       </script>`}
     </div>
   );

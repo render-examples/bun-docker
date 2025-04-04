@@ -1,14 +1,16 @@
-{% set total = 0 %}
-{% for item in items %}
-    <tr>
-        <td>{{ item.pagos.date }}</td>
-        <td>{{ item.pagos.amount }}</td>
-        <td>{% if item.documento.url %}
-            <a target="_blank" href="{{item.documento.url}}" ><i class="fa-solid fa-file"></i></a></td>
-            {% endif %}
-        <td>{{ item.comentario }}</td>
-    </tr>
-    {% set total = total + item.pagos.amount %}
-{% endfor %}
+{% set total = 0 %} {% for item in items %}
+<tr>
+    <td>{{ item.pagos.date }}</td>
+    <td>{{ item.pagos.amount }}</td>
+    <td>
+        {% if item.documento.url %}
+        <a target="_blank" href="{{item.documento.url}}"
+            ><i class="fa-solid fa-file"></i
+        ></a>
+    </td>
+    {% endif %}
+    <td>{{ item.comentario }}</td>
+</tr>
+{% set total = total + item.pagos.amount %} {% endfor %}
 
-<input type="hidden" id="total_pagos" value="{{ total }}">
+<input type="hidden" id="total_pagos" value="{{ total }}" />
