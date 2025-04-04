@@ -11,8 +11,10 @@ class ExtrasRepository {
   }
 
   calculateTotalPrice(data) {
-    if (data.length > 0) return data.reduce((acc, item) => acc + item.price, 0);
-    return 0;
+    return data.reduce((acc, item) => {
+      if (item != null) return acc + item.price;
+      return 0;
+    });
   }
 
   async put(data) {

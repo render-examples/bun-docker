@@ -152,7 +152,7 @@ export const FormGestion = ({ data }) => {
                 return this.total_a_pagar - this.total_pagos - this.abono
               },
               init(){
-               this.total_a_pagar = ${data.extra_total_value || 0} + ${data.plans.price || 0}
+               this.total_a_pagar = ${data ? data.extra_total_value : 0} + ${data ? data.plans.price : 0}
                document
                 .getElementById("payment-table")
                 .addEventListener("htmx:afterRequest", (evt) => {
