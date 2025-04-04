@@ -12,9 +12,11 @@ class ExtrasRepository {
 
   calculateTotalPrice(data) {
     return data.reduce((acc, item) => {
-      if (item != null) return acc + item.price;
-      return 0;
-    });
+      if (item != null) {
+        return acc + (item.price || 0);
+      }
+      return acc;
+    }, 0);
   }
 
   async put(data) {
@@ -39,8 +41,10 @@ class ExtrasRepository {
         evento_extras: sql`JSON_AGG(DISTINCT ${evento_extras})`,
       })
       .from(extras)
-      .leftJoin(evento_extras, eq(evento_extras.eventoId, eventId))
-      .where(eq(evento_extras.eventoId, eventId));
+      .leftJoin(evento_extras, eq(extras.id, evento_extras.extraId))
+      .where(
+        sql`${evento_extras.eventoId} = ${eventId} OR ${evento_extras.eventoId} IS NULL`,
+      );
   }
 }
 
