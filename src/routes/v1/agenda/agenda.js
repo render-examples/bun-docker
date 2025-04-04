@@ -105,10 +105,7 @@ agenda_router.get("/form/:id?", async (c) => {
     data[0].agenda.fecha = moment(data[0].agenda.fecha).format("YYYY-MM-DD");
     data[0].agenda.start = moment(data[0].agenda.start).format("HH:mm");
     data[0].agenda.end = moment(data[0].agenda.end).format("HH:mm");
-    data[0].extra_total_value =
-      data[0].extras.length > 0
-        ? extra_repo.calculateTotalPrice(data[0].extras)
-        : 0;
+    data[0].extra_total_value = extra_repo.calculateTotalPrice(data[0].extras);
   }
 
   c.header("Content-Type", "text/html");

@@ -12,7 +12,7 @@ const agendaValidator = z.object({
   end: z.string().min(1).max(255),
   numero_contacto: z.string().min(1).max(255),
   planId: z.string().min(1).max(255),
-  extras: z.string().min(1).max(255),
+  extras: z.string().max(255).optional(),
 });
 
 const agendaPutValidator = z
