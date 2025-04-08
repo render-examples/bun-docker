@@ -46,8 +46,12 @@ export default function AdminLayout({ nav, main }) {
       </head>
       <body>
         <nav>{nav}</nav>
-        <main class="has-background-light mt-5">
-          <div class="container">
+        <main
+          class="has-background-light mt-5
+          animate__animated
+          animate__fadeIn "
+        >
+          <div class="container is-fluid">
             <div class="columns is-centered">
               <div class="column is-four-fifths">{main}</div>
             </div>

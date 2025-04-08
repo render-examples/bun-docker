@@ -1,18 +1,22 @@
+<div id="{{ chartData.id }}" style="{{ chartData.style }}"></div>
 
+<script>
 
-  <div id="{{ chartData.id }}" style="{{ chartData.style }}"></div>
-  
-  <script>
-    
-      const chartDom = document.getElementById('{{ chartData.id }}');
-      const myChart = echarts.init(chartDom);
-      const option = {
-        title: { text: "{{ chartData.title }}" },
-        tooltip: {},
-        xAxis: { data: {{ chartData.data.x | dump|safe }}, type: 'category' },
-        yAxis: {type: 'value'},
-        series: [{ data:  {{ chartData.data.y | dump| safe }} , type: 'bar' }]
-      };
-      myChart.setOption(option);
-    
-  </script>
+    const chartDom = document.getElementById('{{ chartData.id }}');
+    const myChart = echarts.init(chartDom);
+    const option = {
+      title: { text: "{{ chartData.title }}" },
+      tooltip: {},
+      xAxis: { data: {{ chartData.data.x | dump|safe }}, type: 'category' },
+      yAxis: {type: 'value'},
+      series: [{ data:  {{ chartData.data.y | dump| safe }} , type: 'bar' }],
+      grid: {
+        left: '10%',
+        right: '10%',
+        bottom: '3%',
+        containLabel: true
+      },
+
+    };
+    myChart.setOption(option);
+</script>
