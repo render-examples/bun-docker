@@ -135,7 +135,6 @@ pagos_router.get("/grafico", async (c) => {
     style: "width: 100%; height: 400px;",
   };
 
-  console.log(data);
   c.status(200);
   return c.html(
     c.nunjucks.render("utils/echart-layer.html", { chartData: data }),
