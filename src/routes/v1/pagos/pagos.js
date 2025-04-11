@@ -17,6 +17,8 @@ moment.locale("es");
 
 pagos_router.get("evento/:evento_id", async (c) => {
   let { evento_id } = await c.req.param();
+  console.log(evento_id);
+  if (evento_id == null) return c.text("Error", 500);
   let pagos_result = await c.db
     .select()
     .from(pagos)
