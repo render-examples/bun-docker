@@ -53,7 +53,7 @@ export default function AdminLayout({ nav, main }) {
         >
           <div class="container is-fluid">
             <div class="columns is-centered">
-              <div class="column is-four-fifths">{main}</div>
+              <div class="column is-four-fifths mb-6">{main}</div>
             </div>
           </div>
         </main>

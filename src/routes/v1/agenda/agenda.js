@@ -91,14 +91,14 @@ agenda_router.get("/form/:id?", async (c) => {
       agenda: agenda,
       plans: plans,
       pagos: sql`JSON_AGG(DISTINCT ${pagos})`,
-      extras: sql`(SELECT JSON_AGG(e.* ) FROM ${extras} e)`,
-      evento_extras: sql`JSON_AGG(DISTINCT ${evento_extras})`,
+      extras: sql`JSON_AGG(DISTINCT ${extras})`,
     })
     .from(agenda)
-    .innerJoin(plans, eq(agenda.planId, plans.id))
-    .leftJoin(pagos, eq(plans.id, pagos.planId))
+    .leftJoin(plans, eq(agenda.planId, plans.id))
+    .leftJoin(pagos, eq(agenda.id, pagos.planId))
     .leftJoin(evento_extras, eq(agenda.id, evento_extras.eventoId))
-    .where(eq(agenda.id, id))
+    .leftJoin(extras, eq(evento_extras.extraId, extras.id))
+    .where(and(eq(agenda.id, id), eq(evento_extras.eventoId, id)))
     .groupBy(agenda.id, plans.id);
 
   if (data.length > 0) {
@@ -107,7 +107,7 @@ agenda_router.get("/form/:id?", async (c) => {
     data[0].agenda.end = moment(data[0].agenda.end).format("HH:mm");
     data[0].extra_total_value = extra_repo.calculateTotalPrice(data[0].extras);
   }
-
+  console.log(data);
   c.header("Content-Type", "text/html");
   c.status(200);
   return c.html(<FormGestion data={data ? data[0] : {}} />);
