@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { serveStatic } from "hono/bun";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, or } from "drizzle-orm";
 
 import { ExtrasRepository } from "../extras/ExtrasRepository";
 import { EventosRepository } from "./EventoRepository";
@@ -91,14 +91,14 @@ agenda_router.get("/form/:id?", async (c) => {
       agenda: agenda,
       plans: plans,
       pagos: sql`JSON_AGG(DISTINCT ${pagos})`,
-      extras: sql`JSON_AGG(DISTINCT ${extras})`,
+      extras: sql`(SELECT JSON_AGG(e.* ) FROM ${extras} e)`,
+      evento_extras: sql`JSON_AGG(DISTINCT ${evento_extras})`,
     })
     .from(agenda)
-    .where(eq(agenda.id, id))
     .innerJoin(plans, eq(agenda.planId, plans.id))
     .leftJoin(pagos, eq(plans.id, pagos.planId))
     .leftJoin(evento_extras, eq(agenda.id, evento_extras.eventoId))
-    .leftJoin(extras, eq(evento_extras.extraId, extras.id))
+    .where(eq(agenda.id, id))
     .groupBy(agenda.id, plans.id);
 
   if (data.length > 0) {

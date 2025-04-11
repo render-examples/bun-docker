@@ -62,7 +62,7 @@ export const evento_extras = pgTable("evento_extras", {
     .references(() => agenda.id),
   extraId: integer("extraId")
     .notNull()
-    .references(() => extras.id),
+    .references(() => extras.id, { onDelete: "cascade" }),
 });
 
 export const kids_plans = pgTable("kids_plans", {
