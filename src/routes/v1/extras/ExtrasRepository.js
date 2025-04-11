@@ -37,14 +37,12 @@ class ExtrasRepository {
   async getByEventId(eventId) {
     return await this.context
       .select({
-        extras: sql`JSON_AGG(DISTINCT ${extras})`,
+        extras: sql`(SELECT JSON_AGG(e.*) FROM ${extras} e)`,
         evento_extras: sql`JSON_AGG(DISTINCT ${evento_extras})`,
       })
       .from(extras)
       .leftJoin(evento_extras, eq(extras.id, evento_extras.extraId))
-      .where(
-        sql`${evento_extras.eventoId} = ${eventId} OR ${evento_extras.eventoId} IS NULL`,
-      );
+      .where(sql`${evento_extras.eventoId} = ${eventId} `);
   }
 }
 

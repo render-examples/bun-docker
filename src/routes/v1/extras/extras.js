@@ -54,14 +54,16 @@ extras_router.get("/selector/evento/:id", async (c) => {
   let result = await extraRepo.getByEventId(id);
 
   result[0].extras.forEach((extra) => {
-    if (
-      result[0].evento_extras.find((e) => {
-        if (e !== null) {
-          return e.extraId === extra.id;
-        }
-      })
-    ) {
-      extra.selected = true;
+    if (result[0].evento_extras != null) {
+      if (
+        result[0].evento_extras.find((e) => {
+          if (e !== null) {
+            return e.extraId === extra.id;
+          }
+        })
+      ) {
+        extra.selected = true;
+      }
     }
   });
 
