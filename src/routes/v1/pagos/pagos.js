@@ -16,13 +16,15 @@ require("moment/locale/es");
 moment.locale("es");
 
 pagos_router.get("evento/:evento_id", async (c) => {
-  let { evento_id } = await c.req.param();
-  console.log(evento_id);
-  if (evento_id == null) return c.text("Error", 500);
+  let evento_id = await c.req.param("evento_id");
+
+  if (evento_id == null) {
+    return c.html("<td></td>", 500);
+  }
   let pagos_result = await c.db
     .select()
     .from(pagos)
-    .fullJoin(documento, eq(pagos.id, documento.pagosId))
+    .leftJoin(documento, eq(pagos.id, documento.pagosId))
     .where(eq(pagos.eventoId, evento_id));
 
   if (pagos_result.some((item) => item.documento)) {
