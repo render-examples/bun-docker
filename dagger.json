@@ -1,0 +1,8 @@
+{
+  "name": "jungla-magica",
+  "engineVersion": "v0.18.2",
+  "sdk": {
+    "source": "typescript"
+  },
+  "source": ".dagger"
+}

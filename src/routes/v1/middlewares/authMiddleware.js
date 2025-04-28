@@ -15,7 +15,7 @@ export async function userValidator(c, next) {
       return c.json({ message: "User not found" }, 404);
     } else if (usuario[0].password !== body.get("password")) {
       c.status(401);
-      return c.text("Password incorrecta");
+      return c.json({ message: "Invalid password" });
     }
     await c.req.parseBody();
   }
