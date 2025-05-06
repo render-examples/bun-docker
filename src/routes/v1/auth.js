@@ -51,4 +51,6 @@ auth_routes.get("/logout", async (c) => {
   return c.text("Sesión cerrada correctamente.");
 });
 
+auth_routes.post("/register", async (c) => {});
+
 export { auth_routes };

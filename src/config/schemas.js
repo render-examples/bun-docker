@@ -17,19 +17,46 @@ export const empresas = pgTable("empresas", {
   rut: text("rut"),
 });
 
-export const users = pgTable(
-  "users",
-  {
-    id: serial("id").primaryKey().notNull(),
-    name: text("name"),
-    email: text("email"),
-    password: text("password"),
-    empresaId: integer("empresaId").references(() => empresas.id),
-  },
-  (table) => ({
-    empresaUniqueIndex: uniqueIndex("empresaUniqueIndex").on(table.empresaId),
-  }),
-);
+export const users = pgTable("users", {
+  id: serial("id").primaryKey().notNull(),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  empresaId: integer("empresaId").references(() => empresas.id),
+});
+
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey().notNull(),
+  name: text("name"),
+});
+
+export const users_roles = pgTable("users_roles", {
+  id: serial("id").primaryKey().notNull(),
+  userId: integer("userId")
+    .notNull()
+    .references(() => users.id),
+  roleId: integer("roleId")
+    .notNull()
+    .references(() => roles.id),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const permissions = pgTable("permissions", {
+  id: serial("id").primaryKey().notNull(),
+  name: text("name"),
+  description: text("description"),
+});
+
+export const roles_permissions = pgTable("roles_permissions", {
+  id: serial("id").primaryKey().notNull(),
+  roleId: integer("roleId")
+    .notNull()
+    .references(() => roles.id),
+  permissionId: integer("permissionId")
+    .notNull()
+    .references(() => permissions.id),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+});
 
 export const kids = pgTable("kids", {
   id: serial("id").primaryKey().notNull(),
