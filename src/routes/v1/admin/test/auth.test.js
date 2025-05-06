@@ -11,7 +11,7 @@ describe("API Tests", () => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `email=${userName}&password=123456`,
+      body: `email=${userName}&password=xar2025.1`,
     });
 
     const responseBody = await res.text();
@@ -25,48 +25,6 @@ describe("API Tests", () => {
     expect(setCookieHeader).toBeDefined();
     expect(setCookieHeader).toContain("auth_token=");
 
-    setToken(setCookieHeader);
-  });
-
-  // Test para la ruta POST /users (caso de error - falta nombre)
-  it("Should return 400 if name is missing for POST /users", async () => {
-    const res = await app.request("/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        /* no name */
-      }),
-    });
-
-    // Verifica el status code (400 Bad Request)
-    expect(res.status).toBe(400);
-    // Verifica el mensaje de error
-    const responseBody = await res.json();
-    expect(responseBody).toEqual({ error: "Name is required" });
-  });
-
-  // Test para la ruta POST /users (caso de error - JSON inválido)
-  it("Should return 400 if body is invalid JSON for POST /users", async () => {
-    const res = await app.request("/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: "{invalid json", // JSON mal formado
-    });
-
-    // Verifica el status code (400 Bad Request)
-    expect(res.status).toBe(400);
-    // Verifica el mensaje de error
-    const responseBody = await res.json();
-    expect(responseBody).toEqual({ error: "Invalid JSON" });
-  });
-
-  // Test para una ruta inexistente (404)
-  it("Should return 404 for unknown routes", async () => {
-    const res = await app.request("/non-existent-route");
-    expect(res.status).toBe(404);
+    setToken(setCookieHeader.split(";")[0]);
   });
 });

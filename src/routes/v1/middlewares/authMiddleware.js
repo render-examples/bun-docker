@@ -8,8 +8,8 @@ export async function userValidator(c, next) {
     let body = await c.req.formData();
     let usuario = await c.db
       .select()
-      .from(c.users)
-      .where(eq(c.users.email, body.get("email")));
+      .from(users)
+      .where(eq(users.email, body.get("email")));
 
     if (!usuario.length) {
       return c.json({ message: "User not found" }, 404);
@@ -38,12 +38,12 @@ export async function authMiddleware(c) {
     return { redirect: "/admin/login", status: 401 };
   }
 
-  const data_usuario = await await db
+  const data_usuario = await db
     .select()
     .from(users)
-    .innerJoin(empresas, eq(users.empresaId, empresas.id))
+    .leftJoin(empresas, eq(users.empresaId, empresas.id))
     .where(eq(users.email, decoded.email));
-
+  console.log(data_usuario);
   c.req.validated_user = {
     email: data_usuario[0].users.email,
     name: data_usuario[0].users.name,

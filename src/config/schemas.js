@@ -17,19 +17,13 @@ export const empresas = pgTable("empresas", {
   rut: text("rut"),
 });
 
-export const users = pgTable(
-  "users",
-  {
-    id: serial("id").primaryKey().notNull(),
-    name: text("name"),
-    email: text("email"),
-    password: text("password"),
-    empresaId: integer("empresaId").references(() => empresas.id),
-  },
-  (table) => ({
-    empresaUniqueIndex: uniqueIndex("empresaUniqueIndex").on(table.empresaId),
-  }),
-);
+export const users = pgTable("users", {
+  id: serial("id").primaryKey().notNull(),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  empresaId: integer("empresaId").references(() => empresas.id),
+});
 
 export const roles = pgTable("roles", {
   id: serial("id").primaryKey().notNull(),
