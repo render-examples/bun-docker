@@ -7,6 +7,9 @@ const client = new Client({
   user: Bun.env.db_user,
   password: Bun.env.db_password,
   database: Bun.env.db_db,
+  ssl:{
+    sslmode: "require",
+  }
 });
 
 await client
