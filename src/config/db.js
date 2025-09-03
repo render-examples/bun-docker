@@ -1,27 +1,28 @@
-import { Client } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 
-const client = new Client({
-  host: Bun.env.db_host,
-  port: Bun.env.db_port,
-  user: Bun.env.db_user,
-  password: Bun.env.db_password,
-  database: Bun.env.db_db,
-  ssl:{
-    sslmode: "require",
-  }
+const pool = new Pool({
+  connectionString: Bun.env.db_full_url,
 });
 
-await client
-  .connect()
-  .then(() => {
-    console.log("Connected to the database");
-  })
-  .catch((err) => {
-    console.log("Error connecting to the database", err);
-    throw err;
-  });
+const db = drizzle(pool);
 
-const db = drizzle(client);
+// const client = new Client({
+//   host: Bun.env.db_host,
+//   port: Bun.env.db_port,
+//   user: Bun.env.db_user,
+//   password: Bun.env.db_password,
+//   database: Bun.env.db_db,
+// });
 
-export { db, client };
+// await client
+//   .connect()
+//   .then(() => {
+//     console.log("Connected to the database");
+//   })
+//   .catch((err) => {
+//     console.log("Error connecting to the database", err);
+//     throw err;
+//   });
+
+export { db };
