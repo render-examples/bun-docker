@@ -1,3 +1,6 @@
+previews:
+  generation: automatic
+
 services:
   - type: web
     name: bun
