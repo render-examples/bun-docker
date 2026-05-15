@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "bun app.ts",
+    "workflow": "bun workflow.ts",
     "dev": "bun --hot app.ts",
     "render:example": "bun render-sdk-example.ts"
   },
