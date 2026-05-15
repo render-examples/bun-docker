@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "start": "bun app.ts",
-    "dev": "bun --hot app.ts"
+    "dev": "bun --hot app.ts",
+    "render:example": "bun render-sdk-example.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.6"
+  },
+  "dependencies": {
+    "@renderinc/sdk": "^0.5.0"
   }
 }
